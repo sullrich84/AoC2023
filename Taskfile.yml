@@ -2,6 +2,7 @@ version: "3"
 
 tasks:
   add:
+    silent: true
     #prompt: This will create Day {{.CLI_ARGS}}. Continue?
     cmds:
       - echo "Adding Day {{.CLI_ARGS}}"
