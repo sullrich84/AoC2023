@@ -1,0 +1,11 @@
+version: "3"
+
+tasks:
+  add:
+    #prompt: This will create Day {{.CLI_ARGS}}. Continue?
+    cmds:
+      - echo "Adding Day {{.CLI_ARGS}}"
+      - mkdir day{{.CLI_ARGS}}
+      - cp tmp/solve.js day{{.CLI_ARGS}}/solve.js
+      - cp tmp/data.js day{{.CLI_ARGS}}/data.js
+      - cp tmp/sample.js day{{.CLI_ARGS}}/sample.js
