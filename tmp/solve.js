@@ -2,6 +2,7 @@ import _ from "lodash"
 import data from "./data.js"
 import sample from "./sample.js"
 
+console.clear()
 console.log("🎄 Day XXX: YYY")
 
 const skip1 = false
