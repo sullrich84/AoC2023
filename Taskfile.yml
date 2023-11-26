@@ -11,5 +11,5 @@ tasks:
       - cp tmp/data.js day{{.CLI_ARGS}}/data.js
       - cp tmp/sample.js day{{.CLI_ARGS}}/sample.js
       - | # Workaround since taskfile can't parse : properly
-        jq '.scripts += { "day{{.CLI_ARGS}}" : "node day{{.CLI_ARGS}}/solve.js" }' package.json > package.bak.json
+        jq '.scripts += { "day{{.CLI_ARGS}}" : "deno run day{{.CLI_ARGS}}/solve.js" }' package.json > package.bak.json
       - mv package.bak.json package.json
