@@ -16,3 +16,5 @@ tasks:
       - | # Workaround since taskfile can't parse : properly
         jq '.scripts += { "watch_day{{.CLI_ARGS}}" : "ls day{{.CLI_ARGS}}/*.js | entr -r timeout -k 5 0 npm run day{{.CLI_ARGS}}" }' package.json > package.bak.json
       - mv package.bak.json package.json
+      - sed 's/Day XXX:/Day {{.CLI_ARGS}}:/g' day{{.CLI_ARGS}}/solve.js > day{{.CLI_ARGS}}/solve.bak.js
+      - mv day{{.CLI_ARGS}}/solve.bak.js day{{.CLI_ARGS}}/solve.js
