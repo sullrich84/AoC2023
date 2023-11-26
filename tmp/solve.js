@@ -10,7 +10,9 @@ const run2 = false
 
 /// Part 1
 
-const solve1 = (data) => {}
+const solve1 = (data) => {
+  const skip = {}
+}
 
 const solve1Sample = run1 ? solve1(sample) : "skipped"
 const solve1Data = run1 ? solve1(data) : "skipped"

@@ -12,4 +12,6 @@ tasks:
       - cp tmp/sample.js day{{.CLI_ARGS}}/sample.js
       - | # Workaround since taskfile can't parse : properly
         jq '.scripts += { "day{{.CLI_ARGS}}" : "deno run day{{.CLI_ARGS}}/solve.js" }' package.json > package.bak.json
+      - | # Workaround since taskfile can't parse : properly
+        jq '.scripts += { "watch_day{{.CLI_ARGS}}" : "ls day{{.CLI_ARGS}}/*.js | entr -r timeout -k 5 0 npm run day{{.CLI_ARGS}}" }' package.json > package.bak.json
       - mv package.bak.json package.json

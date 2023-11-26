@@ -7,7 +7,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "tmp": "deno run tmp/solve.js"
+    "tmp": "deno run tmp/solve.js",
+    "watch_tmp": "ls tmp/*.js | entr -r timeout -k 5 0 npm run tmp"
   },
   "dependencies": {
     "lodash": "^4.17.21"
