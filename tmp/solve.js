@@ -3,17 +3,17 @@ import data from "./data.js"
 import sample from "./sample.js"
 
 console.clear()
-console.log("🎄 Day XXX: YYY")
+console.log()
 
-const run1 = true
-const run2 = false
+const runPart1 = true
+const runPart2 = false
 
 /// Part 1
 
 const solve1 = (data) => {}
 
-const solve1Sample = run1 ? solve1(sample) : "skipped"
-const solve1Data = run1 ? solve1(data) : "skipped"
+const solve1Sample = runPart1 ? solve1(sample) : "skipped"
+const solve1Data = runPart1 ? solve1(data) : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
@@ -23,8 +23,8 @@ console.log("Task:\t", solve1Data)
 
 const solve2 = (data) => {}
 
-const solve2Sample = run2 ? solve2(sample) : "skipped"
-const solve2Data = run2 ? solve2(data) : "skipped"
+const solve2Sample = runPart2 ? solve2(sample) : "skipped"
+const solve2Data = runPart2 ? solve2(data) : "skipped"
 
 console.log("\nPart 2:")
 console.log("Sample:\t", solve2Sample)
