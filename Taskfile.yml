@@ -16,6 +16,8 @@ tasks:
       - mv deno.bak.json deno.json
       - sed 's/Day XXX:/Day {{.CLI_ARGS}}:/g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
       - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
+      - sed 's/\/\/ TEMPLATE://g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
+      - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
   fetch:
     silent: true
     vars:
