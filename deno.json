@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "tmp": "deno run --watch tmp/solve.ts",
+    "day1": "deno run --watch day1/solve.ts"
+  },
+  "fmt": {
+    "semiColons": false,
+    "singleQuote": false
+  }
+}

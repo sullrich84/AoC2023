@@ -1,5 +1,7 @@
 version: "3"
 
+dotenv: [".env"]
+
 tasks:
   add:
     silent: true
@@ -7,14 +9,20 @@ tasks:
     cmds:
       - echo "Adding Day {{.CLI_ARGS}}"
       - mkdir day{{.CLI_ARGS}}
-      - cp tmp/solve.js day{{.CLI_ARGS}}/solve.js
-      - cp tmp/data.js day{{.CLI_ARGS}}/data.js
-      - cp tmp/sample.js day{{.CLI_ARGS}}/sample.js
+      - cp tmp/solve.ts day{{.CLI_ARGS}}/solve.ts
+      - cp tmp/data.ts day{{.CLI_ARGS}}/data.ts
       - | # Workaround since taskfile can't parse : properly
-        jq '.scripts += { "day{{.CLI_ARGS}}" : "deno run day{{.CLI_ARGS}}/solve.js" }' package.json > package.bak.json
-      - mv package.bak.json package.json
-      - | # Workaround since taskfile can't parse : properly
-        jq '.scripts += { "watch_day{{.CLI_ARGS}}" : "ls day{{.CLI_ARGS}}/*.js | entr -r timeout -k 5 0 npm run day{{.CLI_ARGS}}" }' package.json > package.bak.json
-      - mv package.bak.json package.json
-      - sed 's/Day XXX:/Day {{.CLI_ARGS}}:/g' day{{.CLI_ARGS}}/solve.js > day{{.CLI_ARGS}}/solve.bak.js
-      - mv day{{.CLI_ARGS}}/solve.bak.js day{{.CLI_ARGS}}/solve.js
+        jq '.tasks += { "day{{.CLI_ARGS}}" : "deno run --watch day{{.CLI_ARGS}}/solve.ts" }' deno.json > deno.bak.json
+      - mv deno.bak.json deno.json
+      - sed 's/Day XXX:/Day {{.CLI_ARGS}}:/g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
+      - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
+  fetch:
+    silent: true
+    vars:
+      DATA:
+        sh: | # Workaround since taskfile can't parse : properly
+            export DATA=$(curl "https://adventofcode.com/2022/day/{{.CLI_ARGS}}/input" -H "cookie: session=$SESSION;")
+    cmds:
+      - sed 's/\/\/ DATA:/{{.DATA}}:/g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
+      - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
+
