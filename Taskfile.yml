@@ -16,15 +16,20 @@ tasks:
       - mv deno.bak.json deno.json
       - sed 's/Day XXX:/Day {{.CLI_ARGS}}:/g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
       - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
-      - sed 's/\/\/ TEMPLATE://g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
+      - sed 's/\/\/ TEMPLATE//g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
       - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
   fetch:
     silent: true
-    vars:
-      DATA:
-        sh: | # Workaround since taskfile can't parse : properly
-            export DATA=$(curl "https://adventofcode.com/2022/day/{{.CLI_ARGS}}/input" -H "cookie: session=$SESSION;")
     cmds:
-      - sed 's/\/\/ DATA:/{{.DATA}}:/g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
-      - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
-
+      - |
+        echo $SESSION
+        curl "https://adventofcode.com/2023/day/{{.CLI_ARGS}}/input" -H "cookie: session=$SESSION;" > day{{.CLI_ARGS}}/task.txt
+        sed -n '1,7p' day{{.CLI_ARGS}}/data.ts > day{{.CLI_ARGS}}/data.bak.ts
+        cat day{{.CLI_ARGS}}/task.txt >> day{{.CLI_ARGS}}/data.bak.ts
+        sed -n '9,$p' day{{.CLI_ARGS}}/data.ts >> day{{.CLI_ARGS}}/data.bak.ts
+        mv day{{.CLI_ARGS}}/data.bak.ts day{{.CLI_ARGS}}/data.ts
+        rm day{{.CLI_ARGS}}/task.txt
+  aoc:
+    cmds:
+      - task: add
+      - task: fetch
