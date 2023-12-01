@@ -1,5 +1,5 @@
 // @deno-types="npm:@types/lodash"
-import _ from "npm:@types/lodash"
+import _ from "npm:lodash"
 import {data, sample, Puzzle } from "./data.ts"
 
 console.clear()

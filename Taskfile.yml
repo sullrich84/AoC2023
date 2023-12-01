@@ -24,11 +24,7 @@ tasks:
       - |
         echo $SESSION
         curl "https://adventofcode.com/2023/day/{{.CLI_ARGS}}/input" -H "cookie: session=$SESSION;" > day{{.CLI_ARGS}}/task.txt
-        sed -n '1,7p' day{{.CLI_ARGS}}/data.ts > day{{.CLI_ARGS}}/data.bak.ts
-        cat day{{.CLI_ARGS}}/task.txt >> day{{.CLI_ARGS}}/data.bak.ts
-        sed -n '9,$p' day{{.CLI_ARGS}}/data.ts >> day{{.CLI_ARGS}}/data.bak.ts
-        mv day{{.CLI_ARGS}}/data.bak.ts day{{.CLI_ARGS}}/data.ts
-        rm day{{.CLI_ARGS}}/task.txt
+      - touch day{{.CLI_ARGS}}/sample.txt
   aoc:
     cmds:
       - task: add
