@@ -1,3 +1,4 @@
+import { sum } from "../utils/utils.ts"
 import { data, Puzzle, sample1, sample2 } from "./data.ts"
 
 console.clear()
@@ -8,12 +9,11 @@ const runPart2 = true
 
 /// Part 1
 
-const solve1 = (data: Puzzle) => {
-  return data.map((v) => v.replace(/[a-z]/g, ""))
+const solve1 = (data: Puzzle) =>
+  data.map((v) => v.replace(/[a-z]/g, ""))
     .map((v) => v.split("").map((v) => parseInt(v)))
     .map((v) => v[0] * 10 + v[v.length - 1])
-    .reduce((p, c) => p + c, 0)
-}
+    .reduce(sum, 0)
 
 const solve1Sample = runPart1 ? solve1(sample1) : "skipped"
 const solve1Data = runPart1 ? solve1(data) : "skipped"
@@ -38,7 +38,7 @@ const solve2 = (data: Puzzle) =>
     .map((v) => v.replace(/[a-zA-z]/g, ""))
     .map((v) => v.split("").map((v) => parseInt(v)))
     .map((v) => v[0] * 10 + v[v.length - 1])
-    .reduce((p, c) => p + c, 0)
+    .reduce(sum, 0)
 
 const solve2Sample = runPart2 ? solve2(sample2) : "skipped"
 const solve2Data = runPart2 ? solve2(data) : "skipped"

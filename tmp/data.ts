@@ -5,5 +5,5 @@ export const sample: Puzzle = [
 ]
 
 export const data: Puzzle = [
-  // DATA
+
 ]
