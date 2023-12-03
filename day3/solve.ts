@@ -6,7 +6,7 @@ console.clear()
 console.log("🎄 Day 3: YYY")
 
 const runPart1 = true
-const runPart2 = false
+const runPart2 = true
 const runBoth = true
 
 /// Part 1
@@ -44,24 +44,17 @@ const solve1 = (data: Puzzle) => {
   }
   resolve()
 
-  let sum = 0
-
-  console.log("m:", machines)
-  console.log("s:", symbols)
-
-  machines.forEach((m) => {
+  const partNumbers = machines.map((m) => {
     // Find symbols arround each machine
     const match = symbols.find((s) =>
       (s.y == m.y - 1 || s.y == m.y || s.y == m.y + 1) &&
-      _.inRange(s.x, m.x - 1, m.x + m.c.length + 1)
+      _.inRange(s.x, m.x - 1, m.x + m.c.length + 2)
     )
 
-    if (match && match.c) {
-      sum += parseInt(m.c)
-    }
+    return match && match.c ? parseInt(m.c) : 0
   })
 
-  return sum
+  return _.sum(partNumbers)
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
@@ -74,66 +67,47 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
-  const mx = data[0].length
-  const my = data.length
-  const pos = { y: NaN, x: NaN }
-  let num = { y: NaN, sx: NaN, ex: NaN, val: "" }
-  const nums = []
-  let res = [] as number[]
-  const gears = []
+  const [my, mx] = [data.length, data[0].length]
+  const machines = [] as { y: number; x: number; c: string }[]
+  const gears = [] as { y: number; x: number; c: string }[]
 
-  function check() {
-    const { y, x } = pos
+  let cur = { y: NaN, x: NaN, c: "" }
 
-    if (num.val == "") return
-    num.ex = x - 1
-    nums.push(num)
-  }
-
-  function reset() {
-    num = { y: NaN, sx: NaN, ex: NaN, val: "" }
+  function resolve() {
+    // Resolve current machine
+    cur.c && machines.push(cur)
+    cur = { y: NaN, x: NaN, c: "" }
   }
 
   for (let y = 0; y < my; y++) {
-    check()
-    reset()
-
+    resolve()
     for (let x = 0; x < mx; x++) {
-      pos.y = y
-      pos.x = x
       const c = data[y][x]
-
-      if (/[0-9]/g.test(c)) {
-        if (_.isNaN(num.y)) num.y = y
-        if (_.isNaN(num.sx)) num.sx = x
-        num.val = num.val.concat(c)
+      if (/[0-9]/.test(c)) {
+        // Construct current machine
+        if (_.isNaN(cur.y)) cur.y = y
+        if (_.isNaN(cur.x)) cur.x = x
+        cur.c = cur.c.concat(c)
       } else {
-        check()
-        reset()
+        resolve()
+        if (c == "*") {
+          // Push symbol
+          gears.push({ y, x, c })
+        }
       }
     }
   }
+  resolve()
 
-  for (let y = 0; y < my; y++) {
-    for (let x = 0; x < mx; x++) {
-      const c = data[y][x]
-      if (c == "*") gears.push({ y, x })
-    }
-  }
+  const res = gears.map((g) => {
+    const adj = machines.filter((m) =>
+      (m.y == g.y - 1 || m.y == g.y || m.y == g.y + 1) &&
+      _.inRange(g.x, m.x - 1, m.x + m.c.length + 1)
+    )
 
-  gears.forEach((g) => {
-    const adj = nums.filter((m) => {
-      const top = m.y == g.y - 1 && _.inRange(g.x, m.sx - 1, m.ex + 2)
-      const bot = m.y == g.y + 1 && _.inRange(g.x, m.sx - 1, m.ex + 2)
-      const left = m.y == g.y && m.sx - 1 == g.x
-      const right = m.y == g.y && m.ex + 1 == g.x
-
-      return top || bot || left || right
-    })
-
-    if (adj.length == 2) {
-      res.push(parseInt(adj[0].val) * parseInt(adj[1].val))
-    }
+    return adj.length == 2
+      ? adj.map((a) => parseInt(a.c)).reduce((p, c) => p * c, 1)
+      : 0
   })
 
   return _.sum(res)

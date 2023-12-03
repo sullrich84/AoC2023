@@ -1,7 +1,7 @@
 export type Puzzle = string[][]
 
 
-export const sample: Puzzle = [
+export const sample1: Puzzle = [
   ["1", "1", ".", ".", ".", ".", ".", ".", ".", "1"],
   ["1", "1", "1", ".", ".", ".", ".", ".", ".", "."],
   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
@@ -15,7 +15,7 @@ export const sample: Puzzle = [
 ]
 
 
-export const sample2: Puzzle = [
+export const sample: Puzzle = [
   ["4", "6", "7", ".", ".", "1", "1", "4", ".", "."],
   [".", ".", ".", "*", ".", ".", ".", ".", ".", "."],
   [".", ".", "3", "5", ".", ".", "6", "3", "3", "."],
