@@ -1,76 +1,67 @@
 // @deno-types="npm:@types/lodash"
-import _ from "npm:lodash"
+import _, { functions } from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
 
 console.clear()
 console.log("🎄 Day 3: YYY")
 
 const runPart1 = true
-const runPart2 = true
+const runPart2 = false
 const runBoth = true
 
 /// Part 1
 
 const solve1 = (data: Puzzle) => {
-  const mx = data[0].length
-  const my = data.length
-  const pos = { y: NaN, x: NaN }
-  let num = { y: NaN, sx: NaN, ex: NaN, val: "" }
-  const nums = [] as number[]
+  const [my, mx] = [data.length, data[0].length]
+  const machines = [] as { y: number; x: number; c: string }[]
+  const symbols = [] as { y: number; x: number; c: string }[]
 
-  function check() {
-    const { y, x } = pos
+  let cur = { y: NaN, x: NaN, c: "" }
 
-    if (num.val == "") return
-    num.ex = x - 1
-
-    const top = []
-    const bot = []
-
-    for (let cx = num.sx - 1; cx <= num.ex + 1; cx++) {
-      top.push((data[y - 1] || [])[cx] || ".")
-    }
-
-    for (let cx = num.sx - 1; cx <= num.ex + 1; cx++) {
-      bot.push((data[y + 1] || [])[cx] || ".")
-    }
-
-    const left = data[y] && data[y][num.sx - 1] || "."
-    const right = data[y] && data[y][num.ex + 1] || "."
-
-    const hasAdj = top.find((e) => e != ".") != undefined ||
-      bot.find((e) => e != ".") != undefined ||
-      left != "." || right != "."
-
-    if (!hasAdj) return
-    nums.push(parseInt(num.val))
-  }
-
-  function reset() {
-    num = { y: NaN, sx: NaN, ex: NaN, val: "" }
+  function resolve() {
+    // Resolve current machine
+    cur.c && machines.push(cur)
+    cur = { y: NaN, x: NaN, c: "" }
   }
 
   for (let y = 0; y < my; y++) {
-    check()
-    reset()
-
+    resolve()
     for (let x = 0; x < mx; x++) {
-      pos.y = y
-      pos.x = x
       const c = data[y][x]
-
-      if (/[0-9]/g.test(c)) {
-        if (_.isNaN(num.y)) num.y = y
-        if (_.isNaN(num.sx)) num.sx = x
-        num.val = num.val.concat(c)
+      if (/[0-9]/.test(c)) {
+        // Construct current machine
+        if (_.isNaN(cur.y)) cur.y = y
+        if (_.isNaN(cur.x)) cur.x = x
+        cur.c = cur.c.concat(c)
       } else {
-        check()
-        reset()
+        resolve()
+        if (c != ".") {
+          // Push symbol
+          symbols.push({ y, x, c })
+        }
       }
     }
   }
+  resolve()
 
-  return _.sum(nums)
+  let sum = 0
+
+  console.log("m:", machines)
+  console.log("s:", symbols)
+
+  machines.forEach((m) => {
+    // Find symbols arround each machine
+    const match = symbols.find((s) =>
+      (s.y == m.y - 1 || s.y == m.y || s.y == m.y + 1) &&
+      _.inRange(s.x, m.x - 1, m.x + m.c.length + 1)
+    )
+
+    if (match && match.c) {
+      sum += parseInt(m.c)
+    }
+  })
+
+  return sum
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
@@ -141,7 +132,7 @@ const solve2 = (data: Puzzle) => {
     })
 
     if (adj.length == 2) {
-      res.push(parseInt(adj[0].val) * parseInt(adj[1].val)) 
+      res.push(parseInt(adj[0].val) * parseInt(adj[1].val))
     }
   })
 
