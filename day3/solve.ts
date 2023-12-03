@@ -44,9 +44,8 @@ const solve1 = (data: Puzzle) => {
 
     // console.log(">", num, top, bot, hasAdj)
 
-    if (hasAdj) {
-      nums.push(parseInt(num.val))
-    }
+    if (!hasAdj) return
+    nums.push(parseInt(num.val))
   }
 
   function reset() {

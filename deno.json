@@ -2,7 +2,8 @@
   "tasks": {
     "tmp": "deno run --watch tmp/solve.ts",
     "day1": "deno run --watch day1/solve.ts",
-    "day2": "deno run --watch day2/solve.ts"
+    "day2": "deno run --watch day2/solve.ts",
+    "day3": "deno run --watch day3/solve.ts"
   },
   "fmt": {
     "semiColons": false,
