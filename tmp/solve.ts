@@ -1,9 +1,10 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import {data, sample, Puzzle } from "./data.ts"
+const input = Deno.readTextFileSync("./day{DAY}/task.txt")
 
 console.clear()
-console.log("🎄 Day XXX: YYY")
+console.log("🎄 Day {DAY}: YYY")
 
 const runPart1 = true
 const runPart2 = false

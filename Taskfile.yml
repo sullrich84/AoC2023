@@ -12,9 +12,9 @@ tasks:
       - cp tmp/solve.ts day{{.CLI_ARGS}}/solve.ts
       - cp tmp/data.ts day{{.CLI_ARGS}}/data.ts
       - | # Workaround since taskfile can't parse : properly
-        jq '.tasks += { "day{{.CLI_ARGS}}" : "deno run --watch day{{.CLI_ARGS}}/solve.ts" }' deno.json > deno.bak.json
+        jq '.tasks += { "day{{.CLI_ARGS}}" : "deno run --allow-read --watch day{{.CLI_ARGS}}/solve.ts" }' deno.json > deno.bak.json
       - mv deno.bak.json deno.json
-      - sed 's/Day XXX:/Day {{.CLI_ARGS}}:/g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
+      - sed 's/{DAY}/{{.CLI_ARGS}}/g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
       - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
       - sed 's/\/\/ TEMPLATE//g' day{{.CLI_ARGS}}/solve.ts > day{{.CLI_ARGS}}/solve.bak.ts
       - mv day{{.CLI_ARGS}}/solve.bak.ts day{{.CLI_ARGS}}/solve.ts
