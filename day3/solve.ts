@@ -42,8 +42,6 @@ const solve1 = (data: Puzzle) => {
       bot.find((e) => e != ".") != undefined ||
       left != "." || right != "."
 
-    // console.log(num, top, bot, hasAdj)
-
     if (!hasAdj) return
     nums.push(parseInt(num.val))
   }
@@ -90,6 +88,7 @@ const solve2 = (data: Puzzle) => {
   const pos = { y: NaN, x: NaN }
   let num = { y: NaN, sx: NaN, ex: NaN, val: "" }
   const nums = []
+  let res = [] as number[]
   const gears = []
 
   function check() {
@@ -124,8 +123,6 @@ const solve2 = (data: Puzzle) => {
     }
   }
 
-  // console.log("machines", nums)
-
   for (let y = 0; y < my; y++) {
     for (let x = 0; x < mx; x++) {
       const c = data[y][x]
@@ -133,9 +130,6 @@ const solve2 = (data: Puzzle) => {
     }
   }
 
-  // console.log("gears:", gears)
-
-  let res = [] as number[]
 
   gears.forEach((g) => {
     const adj = nums.filter((m) => {
@@ -144,16 +138,12 @@ const solve2 = (data: Puzzle) => {
       const left = m.y == g.y && m.sx - 1 == g.x
       const right = m.y == g.y && m.ex + 1 == g.x
 
-      // console.log("machine:", m, top, bot, left, right)
       return top || bot || left || right
     })
 
-    // if (adj.length > 2) throw "too much adj"
     if (adj.length == 2) {
       res.push(parseInt(adj[0].val) * parseInt(adj[1].val)) 
     }
-
-    // console.log(g, adj)
   })
 
   return _.sum(res)
