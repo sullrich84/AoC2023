@@ -5,9 +5,9 @@ import { data, Puzzle, sample } from "./data.ts"
 console.clear()
 console.log("🎄 Day 3: YYY")
 
-const runPart1 = true
-const runPart2 = false
-const runBoth = true
+const runPart1 = false
+const runPart2 = true
+const runBoth = false
 
 /// Part 1
 
@@ -89,7 +89,8 @@ const solve2 = (data: Puzzle) => {
   const my = data.length
   const pos = { y: NaN, x: NaN }
   let num = { y: NaN, sx: NaN, ex: NaN, val: "" }
-  const nums = [] as number[]
+  const nums = []
+  const gears = []
 
   function check() {
     const { y, x } = pos
@@ -97,28 +98,28 @@ const solve2 = (data: Puzzle) => {
     if (num.val == "") return
     num.ex = x - 1
 
-    const top = []
-    const bot = []
-
-    for (let cx = num.sx - 1; cx <= num.ex + 1; cx++) {
-      top.push((data[y - 1] || [])[cx] || ".")
-    }
-
-    for (let cx = num.sx - 1; cx <= num.ex + 1; cx++) {
-      bot.push((data[y + 1] || [])[cx] || ".")
-    }
-
-    const left = data[y] && data[y][num.sx - 1] || "."
-    const right = data[y] && data[y][num.ex + 1] || "."
-
-    const hasAdj = top.find((e) => e != ".") != undefined ||
-      bot.find((e) => e != ".") != undefined ||
-      left != "." || right != "."
-
+    // const top = []
+    // const bot = []
+    //
+    // for (let cx = num.sx - 1; cx <= num.ex + 1; cx++) {
+    //   top.push((data[y - 1] || [])[cx] || ".")
+    // }
+    //
+    // for (let cx = num.sx - 1; cx <= num.ex + 1; cx++) {
+    //   bot.push((data[y + 1] || [])[cx] || ".")
+    // }
+    //
+    // const left = data[y] && data[y][num.sx - 1] || "."
+    // const right = data[y] && data[y][num.ex + 1] || "."
+    //
+    // const hasAdj = top.find((e) => e != ".") != undefined ||
+    //   bot.find((e) => e != ".") != undefined ||
+    //   left != "." || right != "."
+    //
     // console.log(num, top, bot, hasAdj)
-
-    if (!hasAdj) return
-    nums.push(parseInt(num.val))
+    //
+    // if (!hasAdj) return
+    nums.push(num)
   }
 
   function reset() {
@@ -134,18 +135,43 @@ const solve2 = (data: Puzzle) => {
       pos.x = x
       const c = data[y][x]
 
-      if (c != "." && /[0-9]/g.test(c)) {
-        if (_.isNaN(num.y)) num.y = y
-        if (_.isNaN(num.sx)) num.sx = x
-        num.val = num.val.concat(c)
-      } else {
+      if (c == "*") {
         check()
         reset()
+        num.y = y
+        num.sx = x
+        num.val = c
+        gears.push(num)
+      } else {
+        if (/[0-9]/g.test(c)) {
+          if (_.isNaN(num.y)) num.y = y
+          if (_.isNaN(num.sx)) num.sx = x
+          num.val = num.val.concat(c)
+        } else {
+          check()
+          reset()
+        }
       }
     }
   }
 
-  return _.sum(nums)
+  gears.forEach((g) => {
+    console.log("gear:", g)
+
+    const adj = nums.filter((m) => m.val != "*").filter((m) => {
+      const top = g.y == m.y - 1 && _.inRange(g.sx, m.sx - 1, m.ex + 2)
+      const bot = g.x == m.y + 1 && _.inRange(g.sx, m.sx - 1, m.ex + 2)
+      const left = g.y == m.y && g.sx - 1 === m.sx
+      const right = g.y == m.y && g.sx + 1 === m.ex
+
+      console.log("machine:", m, top, bot, left, right)
+      return top || bot || left || right
+    })
+
+    console.log(g, adj)
+  })
+
+  return 0 //[gears, nums]
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
