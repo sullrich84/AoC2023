@@ -15,7 +15,7 @@ const solve1 = (data: Puzzle) => {
   const mx = data[0].length
   const my = data.length
   const pos = { y: NaN, x: NaN }
-  let num = { y: null, sx: null, ex: null, val: "" }
+  let num = { y: NaN, sx: NaN, ex: NaN, val: "" } 
   const nums = [] as number[]
 
   function check() {
@@ -24,8 +24,8 @@ const solve1 = (data: Puzzle) => {
     if (num.val == "") return
     num.ex = x - 1
 
-    let top = []
-    let bot = []
+    const top = []
+    const bot = []
 
     for (let cx = num.sx - 1; cx <= num.ex + 1; cx++) {
       top.push((data[y - 1] || [])[cx] || ".")
@@ -35,10 +35,10 @@ const solve1 = (data: Puzzle) => {
       bot.push((data[y + 1] || [])[cx] || ".")
     }
 
-    let left = data[y] && data[y][num.sx - 1] || "."
-    let right = data[y] && data[y][num.ex + 1] || "."
+    const left = data[y] && data[y][num.sx - 1] || "."
+    const right = data[y] && data[y][num.ex + 1] || "."
 
-    let hasAdj = top.find((e) => e != ".") != undefined ||
+    const hasAdj = top.find((e) => e != ".") != undefined ||
       bot.find((e) => e != ".") != undefined ||
       left != "." || right != "."
 
@@ -49,7 +49,7 @@ const solve1 = (data: Puzzle) => {
   }
 
   function reset() {
-    num = { y: null, sx: null, ex: null, val: "" }
+    num = { y: NaN, sx: NaN, ex: NaN, val: "" }
   }
 
   for (let y = 0; y < my; y++) {
@@ -62,8 +62,8 @@ const solve1 = (data: Puzzle) => {
       const c = data[y][x]
 
       if (c != "." && /[0-9]/g.test(c)) {
-        if (num.y == null) num.y = y
-        if (num.sx == null) num.sx = x
+        if (_.isNaN(num.y)) num.y = y
+        if (_.isNaN(num.sx)) num.sx = x
         num.val = num.val.concat(c)
       } else {
         check()
