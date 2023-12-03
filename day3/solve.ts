@@ -15,7 +15,7 @@ const solve1 = (data: Puzzle) => {
   const mx = data[0].length
   const my = data.length
   const pos = { y: NaN, x: NaN }
-  let num = { y: NaN, sx: NaN, ex: NaN, val: "" } 
+  let num = { y: NaN, sx: NaN, ex: NaN, val: "" }
   const nums = [] as number[]
 
   function check() {
@@ -42,7 +42,7 @@ const solve1 = (data: Puzzle) => {
       bot.find((e) => e != ".") != undefined ||
       left != "." || right != "."
 
-    // console.log(">", num, top, bot, hasAdj)
+    // console.log(num, top, bot, hasAdj)
 
     if (!hasAdj) return
     nums.push(parseInt(num.val))
