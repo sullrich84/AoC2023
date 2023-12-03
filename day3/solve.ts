@@ -5,7 +5,7 @@ import { data, Puzzle, sample } from "./data.ts"
 console.clear()
 console.log("🎄 Day 3: YYY")
 
-const runPart1 = false
+const runPart1 = true
 const runPart2 = true
 const runBoth = true
 
@@ -129,7 +129,6 @@ const solve2 = (data: Puzzle) => {
       if (c == "*") gears.push({ y, x })
     }
   }
-
 
   gears.forEach((g) => {
     const adj = nums.filter((m) => {
