@@ -1,23 +1,21 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
-// const data = Deno.readTextFileSync("./day4/task.txt")
-// const input = Deno.readTextFileSync("./day4/sample.txt")
 
 console.clear()
-console.log("🎄 Day 4: YYY")
+console.log("🎄 Day 4: Scratchcards")
 
-const runPart1 = false
+const runPart1 = true
 const runPart2 = true
-const runBoth = false
+const runBoth = true
 
 /// Part 1
 
 const solve1 = (data: Puzzle) => {
   const points = data.map(({ win, play }) => {
-    const wins = play.filter((pc) => win.find((wc) => wc == pc))
+    const wins = play.filter((p) => win.find((w) => w == p))
     if (wins.length == 0) return 0
-    return wins.slice(1).reduce((p, c) => p * 2, 1)
+    return _.times(wins.length - 1).reduce((p, _) => p * 2, 1)
   })
 
   return _.sum(points)
@@ -33,31 +31,25 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
-  // const instances = data.map(({ win, play }) => ({ win, play, inst: [] }))
-  const points: number[] = []
-  const copys: number[] = []
   const instances: { [key: number]: number } = {}
 
-  var runs = _.isNumber(instances[i]) ? instances[i] : 1
-  for (let r = 0; r < runs; r++) {
+  for (let i = 0; i < data.length; i++) {
     const { win, play } = data[i]
-    const wins = play.filter((pc) => win.find((wc) => wc == pc))
+    const wins = play.filter((p) => win.find((w) => w == p))
+    if (wins.length == 0) continue
 
-    if (wins.length == 0) {
-      continue
-    }
+    const pts = wins.length
+    const runs = instances[i] + 1 || 1
 
-    const pts = wins.slice(1).reduce((p, c) => p * 2, 1)
-
-    for (let p = 0; p < pts; p++) {
-      const nc = i + p + 1
-      if (nc > data.length) continue
-      instances[nc] = _.isNumber(instances[nc]) ? instances[nc] + 1 : 1
+    for (let r = 0; r < runs; r++) {
+      for (let p = 0; p < pts; p++) {
+        const nc = i + p + 1
+        instances[nc] = instances[nc] ? instances[nc] + 1 : 1
+      }
     }
   }
 
-  console.log(instances)
-  return _.sum(_.values(instances))
+  return _.sum(data.map((_, i) => instances[i] + 1 || 1))
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
