@@ -1,12 +1,12 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
-import { debug, removeOverlappingRanges, wait } from "../utils/utils.ts"
+import { removeOverlappingRanges } from "../utils/utils.ts"
 
 console.clear()
 console.log("🎄 Day 5: YYY")
 
-const runPart1 = false
+const runPart1 = true
 const runPart2 = true
 const runBoth = true
 
@@ -37,22 +37,28 @@ const lookup = (
 }
 
 const solve1 = (data: Puzzle) => {
-  const locations = []
+  let minLocation = Number.POSITIVE_INFINITY
 
-  for (let s = 0; s < data.seeds.length; s++) {
-    const seed = data.seeds[s]
+  const getLocation = (seed: number) => {
     const soil = lookup(seed, data.seed_to_soil)
     const fertilizer = lookup(soil, data.soil_to_fertilizer)
     const water = lookup(fertilizer, data.fertilizer_to_water)
     const light = lookup(water, data.water_to_light)
     const temperature = lookup(light, data.light_to_temperature)
     const humidity = lookup(temperature, data.temperature_to_humidity)
-    const location = lookup(humidity, data.humidity_to_location)
-
-    locations.push(location)
+    return lookup(humidity, data.humidity_to_location)
   }
 
-  return _.min(locations)
+  for (let s = 0; s < data.seeds.length; s++) {
+    const seed = data.seeds[s]
+    const location = getLocation(seed)
+
+    if (location < minLocation) {
+      minLocation = location
+    }
+  }
+
+  return minLocation
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
@@ -64,37 +70,38 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-const solve2 = (data: Puzzle) => {
-  const seeds = []
+const solve2 = (data: Puzzle, stepSize: number) => {
+  let minLocation = Number.POSITIVE_INFINITY
+  let minSeed = Number.POSITIVE_INFINITY
 
-  // Get list of all seed ranges
+  const getLocation = (seed: number) => {
+    const soil = lookup(seed, data.seed_to_soil)
+    const fertilizer = lookup(soil, data.soil_to_fertilizer)
+    const water = lookup(fertilizer, data.fertilizer_to_water)
+    const light = lookup(water, data.water_to_light)
+    const temperature = lookup(light, data.light_to_temperature)
+    const humidity = lookup(temperature, data.temperature_to_humidity)
+    return lookup(humidity, data.humidity_to_location)
+  }
+
+  const seeds = []
   for (let i = 0; i < data.seeds.length; i += 2) {
     const seed = data.seeds[i]
     const seedLen = data.seeds[i + 1]
     seeds.push({ start: seed, end: seed + seedLen - 1 })
   }
-
+  
   // Remove overlapping seed ranges
   const seedRange = removeOverlappingRanges(seeds)
 
-  let minLocation = Number.POSITIVE_INFINITY
-  let minSeed = Number.POSITIVE_INFINITY
-
+  // "... und bist du nicht willig, so brauch ich Gewalt" — Goethe
   for (let i = 0; i < seedRange.length; i++) {
     const { start, end } = seedRange[i]
 
-    // "... und bist du nicht willig, so brauch ich Gewalt" — Goethe
-    const stepSize = 1_000
-
+    // Do a rough scan for local mins
     for (let s = start; s < end; s += stepSize) {
       const seed = s
-      const soil = lookup(seed, data.seed_to_soil)
-      const fertilizer = lookup(soil, data.soil_to_fertilizer)
-      const water = lookup(fertilizer, data.fertilizer_to_water)
-      const light = lookup(water, data.water_to_light)
-      const temperature = lookup(light, data.light_to_temperature)
-      const humidity = lookup(temperature, data.temperature_to_humidity)
-      const location = lookup(humidity, data.humidity_to_location)
+      const location = getLocation(seed)
 
       if (location < minLocation) {
         minLocation = location
@@ -102,18 +109,16 @@ const solve2 = (data: Puzzle) => {
       }
     }
 
-    const startSeed = minSeed - stepSize
+    // Setup the search range for the absolute min
+    // Don't fall below initial start seed
+    const startSeed = Math.max(minSeed - stepSize, start)
+    const endSeed = minSeed + stepSize
+    const range = endSeed - startSeed
 
-    // Now, find the smallest location and check the 2000 neighbours as well
-    for (let i = 0; i < stepSize * 2; i++) {
+    // Now, scan the the range for the absolute min 
+    for (let i = 0; i < range; i++) {
       const seed = startSeed + i
-      const soil = lookup(seed, data.seed_to_soil)
-      const fertilizer = lookup(soil, data.soil_to_fertilizer)
-      const water = lookup(fertilizer, data.fertilizer_to_water)
-      const light = lookup(water, data.water_to_light)
-      const temperature = lookup(light, data.light_to_temperature)
-      const humidity = lookup(temperature, data.temperature_to_humidity)
-      const location = lookup(humidity, data.humidity_to_location)
+      const location = getLocation(seed)
 
       if (location < minLocation) {
         minLocation = location
@@ -126,6 +131,6 @@ const solve2 = (data: Puzzle) => {
 }
 
 console.log("\nPart 2:")
-console.log("Sample:\t", runPart2 ? solve2(sample) : "skipped")
-console.log("Task:\t", runPart2 && runBoth ? solve2(data) : "skipped")
+console.log("Sample:\t", runPart2 ? solve2(sample, 1) : "skipped")
+console.log("Task:\t", runPart2 && runBoth ? solve2(data, 50_000) : "skipped")
 console.log()
