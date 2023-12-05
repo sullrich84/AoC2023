@@ -1,15 +1,13 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
-import { debug, wait } from "../utils/utils.ts"
-// const data = Deno.readTextFileSync("./day5/task.txt")
-// const input = Deno.readTextFileSync("./day5/sample.txt")
+import { debug, removeOverlappingRanges, wait } from "../utils/utils.ts"
 
 console.clear()
 console.log("🎄 Day 5: YYY")
 
-const runPart1 = true
-const runPart2 = false
+const runPart1 = false
+const runPart2 = true
 const runBoth = true
 
 /// Part 1
@@ -20,7 +18,6 @@ const conv = (
   source: number,
   len: number,
 ) => {
-  // console.log(input, ">", dest, source, len)
   if (!_.inRange(input, source, source + len)) return null
   return dest + (input - source)
 }
@@ -32,22 +29,14 @@ const lookup = (
   const res = []
 
   for (let i = 0; i < check.length; i++) {
-    const c = conv(input, check[i].dest, check[i].source, check[i].len)
-    // console.log(input, check[i].dest, check[i].source, check[i].len, c);
-    res.push(c)
+    res.push(conv(input, check[i].dest, check[i].source, check[i].len))
   }
 
-  // console.log("res", res.find(e => _.isNumber(e)))
   const result = res.find((e) => _.isNumber(e))
   return _.isNumber(result) ? result : input
 }
 
 const solve1 = (data: Puzzle) => {
-  console.log(79, ">", lookup(79, data.seed_to_soil), "=", 81)
-  console.log(14, ">", lookup(14, data.seed_to_soil), "=", 14)
-  console.log(55, ">", lookup(55, data.seed_to_soil), "=", 57)
-  console.log(13, ">", lookup(13, data.seed_to_soil), "=", 13)
-
   const locations = []
 
   for (let s = 0; s < data.seeds.length; s++) {
@@ -59,17 +48,6 @@ const solve1 = (data: Puzzle) => {
     const temperature = lookup(light, data.light_to_temperature)
     const humidity = lookup(temperature, data.temperature_to_humidity)
     const location = lookup(humidity, data.humidity_to_location)
-
-    // console.log({
-    //   seed,
-    //   soil,
-    //   fertilizer,
-    //   water,
-    //   light,
-    //   temperature,
-    //   humidity,
-    //   location,
-    // })
 
     locations.push(location)
   }
@@ -87,12 +65,67 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
+  const seeds = []
+
+  // Get list of all seed ranges
+  for (let i = 0; i < data.seeds.length; i += 2) {
+    const seed = data.seeds[i]
+    const seedLen = data.seeds[i + 1]
+    seeds.push({ start: seed, end: seed + seedLen - 1 })
+  }
+
+  // Remove overlapping seed ranges
+  const seedRange = removeOverlappingRanges(seeds)
+
+  let minLocation = Number.POSITIVE_INFINITY
+  let minSeed = Number.POSITIVE_INFINITY
+
+  for (let i = 0; i < seedRange.length; i++) {
+    const { start, end } = seedRange[i]
+
+    // "... und bist du nicht willig, so brauch ich Gewalt" — Goethe
+    const stepSize = 1_000
+
+    for (let s = start; s < end; s += stepSize) {
+      const seed = s
+      const soil = lookup(seed, data.seed_to_soil)
+      const fertilizer = lookup(soil, data.soil_to_fertilizer)
+      const water = lookup(fertilizer, data.fertilizer_to_water)
+      const light = lookup(water, data.water_to_light)
+      const temperature = lookup(light, data.light_to_temperature)
+      const humidity = lookup(temperature, data.temperature_to_humidity)
+      const location = lookup(humidity, data.humidity_to_location)
+
+      if (location < minLocation) {
+        minLocation = location
+        minSeed = seed
+      }
+    }
+
+    const startSeed = minSeed - stepSize
+
+    // Now, find the smallest location and check the 2000 neighbours as well
+    for (let i = 0; i < stepSize * 2; i++) {
+      const seed = startSeed + i
+      const soil = lookup(seed, data.seed_to_soil)
+      const fertilizer = lookup(soil, data.soil_to_fertilizer)
+      const water = lookup(fertilizer, data.fertilizer_to_water)
+      const light = lookup(water, data.water_to_light)
+      const temperature = lookup(light, data.light_to_temperature)
+      const humidity = lookup(temperature, data.temperature_to_humidity)
+      const location = lookup(humidity, data.humidity_to_location)
+
+      if (location < minLocation) {
+        minLocation = location
+        minSeed = seed
+      }
+    }
+  }
+
+  return minLocation
 }
 
-const solve2Sample = runPart2 ? solve2(sample) : "skipped"
-const solve2Data = runPart2 && runBoth ? solve2(data) : "skipped"
-
 console.log("\nPart 2:")
-console.log("Sample:\t", solve2Sample)
-console.log("Task:\t", solve2Data)
+console.log("Sample:\t", runPart2 ? solve2(sample) : "skipped")
+console.log("Task:\t", runPart2 && runBoth ? solve2(data) : "skipped")
 console.log()
