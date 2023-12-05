@@ -16,5 +16,12 @@
       }
     }
   },
-  "remote": {}
+  "redirects": {
+    "https://deno.land/x/json_colorize/mod.ts": "https://deno.land/x/json_colorize@0.1.0/mod.ts"
+  },
+  "remote": {
+    "https://deno.land/x/json_colorize@0.1.0/mod.ts": "1d0c4053ada2b4b21b635509eb30140f3a3cec05dc091fc7e615f71bb45588e4",
+    "https://deno.land/x/json_colorize@0.1.0/src/colorizer.ts": "674fbce54184932e388815ea874aa996d852bb3b33f91a167ab9fa3010a715e0",
+    "https://deno.land/x/json_colorize@0.1.0/src/lexer.ts": "5180ef42f5813a7904919f441b95e9d8515a63cd66781e9dd731e9e69115791f"
+  }
 }
