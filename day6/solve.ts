@@ -10,7 +10,7 @@ console.log("🎄 Day 6: YYY")
 
 const runPart1 = true
 const runPart2 = false
-const runBoth = false
+const runBoth = true
 
 /// Part 1
 
@@ -20,13 +20,20 @@ const solve1 = (data: Puzzle) => {
   for (let race = 0; race < data.length; race++) {
     const ttb = data[race].ms
     const dtb = data[race].mm
-    const distances = []
+    const wins = []
 
     for (let pushTime = 0; pushTime < ttb; pushTime++) {
-      
+      if (pushTime == 0) continue
 
+      const distance = (ttb - pushTime) * pushTime
+      if (distance <= dtb) continue
+
+      wins.push(distance)
+      console.log({ pushTime, distance, dtb })
     }
-    wait()
+
+    const waysToWin = wins.length
+    results.push(waysToWin)
   }
 
   return results.reduce((p, c) => p * c, 1)
@@ -42,6 +49,28 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
+  const results = []
+
+  for (let race = 0; race < data.length; race++) {
+    const ttb = data[race].ms
+    const dtb = data[race].mm
+    const wins = []
+
+    for (let pushTime = 0; pushTime < ttb; pushTime++) {
+      if (pushTime == 0) continue
+
+      const distance = (ttb - pushTime) * pushTime
+      if (distance <= dtb) continue
+
+      wins.push(distance)
+      console.log({ pushTime, distance, dtb })
+    }
+
+    const waysToWin = wins.length
+    results.push(waysToWin)
+  }
+
+  return results.reduce((p, c) => p * c, 1)
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
