@@ -1,25 +1,13 @@
 // @deno-types="npm:@types/lodash"
-import _, { lowerCase } from "npm:lodash"
-import { Counter } from "../utils/counter.ts"
+import _ from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
-import { wait } from "../utils/utils.ts"
 
 console.clear()
 console.log("🎄 Day 7: YYY")
 
-const runPart1 = false
+const runPart1 = true
 const runPart2 = true
 const runBoth = true
-
-/// Part 1
-type Kind =
-  | "high_card"
-  | "one_pair"
-  | "two_pair"
-  | "three_of_a_kind"
-  | "full_house"
-  | "four_of_a_kind"
-  | "five_of_a_kind"
 
 const types = {
   five_of_a_kind: 0,
@@ -31,13 +19,15 @@ const types = {
   high_card: 6,
 }
 
+const typeKeys = _.keys(types)
+
 const getType = (hand: string) => {
   const uniqCards = _.uniq(hand).length
+  const [a, b, c, d, e] = hand.split("").sort()
+
   if (uniqCards == 1) {
     return types.five_of_a_kind
   }
-
-  const [a, b, c, d, e] = hand.split("").sort()
 
   if (uniqCards == 2) {
     return (a == b && b == c && c == d) || (b == c && c == d && d == e)
@@ -58,7 +48,11 @@ const getType = (hand: string) => {
   return types.high_card
 }
 
+/// Part 1
+
 const solve1 = (data: Puzzle) => {
+  const result = []
+
   const strength = {
     "A": 0,
     "K": 1,
@@ -74,8 +68,6 @@ const solve1 = (data: Puzzle) => {
     "3": 11,
     "2": 12,
   }
-
-  let result = []
 
   const rankDeck = {
     high_card: [],
@@ -93,7 +85,10 @@ const solve1 = (data: Puzzle) => {
     rankDeck[typeName].push({ hand, bid })
   })
 
-  const byStrength = ({ hand: a }, { hand: b }) => {
+  const byStrength = (
+    { hand: a }: { hand: string },
+    { hand: b }: { hand: string },
+  ) => {
     if (a == b) return 0
     const aSplit = a.split("").map((c) => strength[c])
     const bSplit = b.split("").map((c) => strength[c])
@@ -126,6 +121,8 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
+  const result = []
+
   const strength = {
     "A": 0,
     "K": 1,
@@ -142,8 +139,6 @@ const solve2 = (data: Puzzle) => {
     "J": 12,
   }
 
-  const result = []
-
   const rankDeck = {
     high_card: [],
     one_pair: [],
@@ -154,43 +149,26 @@ const solve2 = (data: Puzzle) => {
     five_of_a_kind: [],
   }
 
-  // data = []
-  // // 5
-  // data.push({ hand: "JJJJJ", bid: 1 })
-  //
-  // // 4
-  // data.push({ hand: "JJJJ4", bid: 1 })
-  //
-  // // 3
-  // data.push({ hand: "JJJ44", bid: 1 })
-  // data.push({ hand: "JJJ42", bid: 1 })
-  //
-  // // 2
-  // data.push({ hand: "JJ444", bid: 1 })
-  // data.push({ hand: "JJ443", bid: 1 })
-  // data.push({ hand: "JJ432", bid: 1 })
-  //
-  // // 1
-  // data.push({ hand: "J5555", bid: 1 })
-  // data.push({ hand: "J5552", bid: 1 })
-  // data.push({ hand: "J5522", bid: 1 })
-  // data.push({ hand: "J5523", bid: 1 })
-  // data.push({ hand: "J5432", bid: 1 })
-
-  // Two pair test
-  // data.push({ hand: "J5422", bid: 1 })
-
   data.forEach(({ hand, bid }) => {
     let type, typeName
-
     const jokers = hand.split("").filter((c) => c == "J").length
     const cards = hand.split("").filter((c) => c != "J").sort()
+    const uLen = _.uniq(cards).length
+    
+    switch(jokers) {
+      case 5:
+      case 0:
+        typeName = typeKeys[getType(hand)]
+        break
+
+      case 4:
+        break
+    }
 
     if (jokers == 0 || jokers == 5) {
       type = getType(hand)
       typeName = _.keys(types)[type]
     } else {
-      const uLen = _.uniq(cards).length
 
       if (jokers == 4) {
         type = types.five_of_a_kind
@@ -198,13 +176,11 @@ const solve2 = (data: Puzzle) => {
       }
 
       if (jokers == 3) {
-        // 3 Joker and 1 pair
         if (uLen == 1) {
           type = types.five_of_a_kind
           typeName = _.keys(types)[type]
         }
 
-        // 3 Joker and 2 random
         if (uLen == 2) {
           type = types.four_of_a_kind
           typeName = _.keys(types)[type]
@@ -212,19 +188,16 @@ const solve2 = (data: Puzzle) => {
       }
 
       if (jokers == 2) {
-        // 2 Joker and 1 tripple
         if (uLen == 1) {
           type = types.five_of_a_kind
           typeName = _.keys(types)[type]
         }
 
-        // 2 Joker 1 pair 1 random: Assign jokers to random for five_of_a_kind
         if (uLen == 2) {
           type = types.four_of_a_kind
           typeName = _.keys(types)[type]
         }
 
-        // 2 Joker 3 random
         if (uLen == 3) {
           type = types.three_of_a_kind
           typeName = _.keys(types)[type]
@@ -232,22 +205,19 @@ const solve2 = (data: Puzzle) => {
       }
 
       if (jokers == 1) {
-        // 1 Joker 4 random
         if (uLen == 4) {
           type = types.one_pair
           typeName = _.keys(types)[type]
         }
 
-        // 1 Joker 1 pair 2 random
         if (uLen == 3) {
           type = types.three_of_a_kind
           typeName = _.keys(types)[type]
         }
 
-        // 1 Joker 2 pairs or 1 tripple and 1 random
         if (uLen == 2) {
           const t = cards.filter((c) => c == cards[0]).length
-          
+
           if (t == 1 || t == 3) {
             type = types.four_of_a_kind
             typeName = _.keys(types)[type]
@@ -259,7 +229,6 @@ const solve2 = (data: Puzzle) => {
           }
         }
 
-        // 1 Joker 1 quad
         if (uLen == 1) {
           type = types.five_of_a_kind
           typeName = _.keys(types)[type]
@@ -267,19 +236,15 @@ const solve2 = (data: Puzzle) => {
       }
     }
 
-    console.log({ jokers, hand, type, typeName })
     rankDeck[typeName].push({ hand, bid })
   })
 
-  console.log(rankDeck);
-  
-
   const byStrength = ({ hand: a }, { hand: b }) => {
     if (a == b) return 0
-    const aSplit = a.split("").map((c) => strength[c])
-    const bSplit = b.split("").map((c) => strength[c])
+    const aSplit: string[] = a.split("").map((c: string) => strength[c])
+    const bSplit: string[] = b.split("").map((c) => strength[c])
 
-    for (var i = 0; i < aSplit.length; i++) {
+    for (let i = 0; i < aSplit.length; i++) {
       if (aSplit[i] !== bSplit[i]) {
         return bSplit[i] - aSplit[i]
       }
@@ -294,14 +259,11 @@ const solve2 = (data: Puzzle) => {
     result.push(...rankDeck[keys[k]])
   }
 
-
   return result.map((c, i) => c.bid * (i + 1)).reduce((a, b) => a + b, 0)
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
 const solve2Data = runPart2 && runBoth ? solve2(data) : "skipped"
-
-// < 250580801
 
 console.log("\nPart 2:")
 console.log("Sample:\t", solve2Sample)
