@@ -1,6 +1,7 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
+import { data1 } from "../day6/data.ts"
 
 console.clear()
 console.log("🎄 Day 7: YYY")
@@ -21,28 +22,23 @@ const types = {
 
 const typeKeys = _.keys(types)
 
-const getType = (hand: string) => {
+const getType = (hand: string): number => {
   const uniqCards = _.uniq(hand).length
   const [a, b, c, d, e] = hand.split("").sort()
 
-  if (uniqCards == 1) {
-    return types.five_of_a_kind
-  }
-
-  if (uniqCards == 2) {
-    return (a == b && b == c && c == d) || (b == c && c == d && d == e)
-      ? types.four_of_a_kind
-      : types.full_house
-  }
-
-  if (uniqCards == 3) {
-    return (a == b && b == c) || (b == c && c == d) || (c == d && d == e)
-      ? types.three_of_a_kind
-      : types.two_pair
-  }
-
-  if (uniqCards == 4) {
-    return types.one_pair
+  switch (uniqCards) {
+    case 1:
+      return types.five_of_a_kind
+    case 2:
+      return (a == b && b == c && c == d) || (b == c && c == d && d == e)
+        ? types.four_of_a_kind
+        : types.full_house
+    case 3:
+      return (a == b && b == c) || (b == c && c == d) || (c == d && d == e)
+        ? types.three_of_a_kind
+        : types.two_pair
+    case 4:
+      return types.one_pair
   }
 
   return types.high_card
@@ -80,15 +76,11 @@ const solve1 = (data: Puzzle) => {
   }
 
   data.forEach(({ hand, bid }) => {
-    const type = getType(hand)
-    const typeName = _.keys(types)[type]
+    const typeName = typeKeys[getType(hand)]
     rankDeck[typeName].push({ hand, bid })
   })
 
-  const byStrength = (
-    { hand: a }: { hand: string },
-    { hand: b }: { hand: string },
-  ) => {
+  const byStrength = ({ hand: a }, { hand: b }) => {
     if (a == b) return 0
     const aSplit = a.split("").map((c) => strength[c])
     const bSplit = b.split("").map((c) => strength[c])
@@ -102,11 +94,10 @@ const solve1 = (data: Puzzle) => {
     return 0
   }
 
-  const keys = _.keys(rankDeck)
-  for (let k = 0; k < keys.length; k++) {
-    rankDeck[keys[k]].sort(byStrength)
-    result.push(...rankDeck[keys[k]])
-  }
+  _.keys(rankDeck).forEach((key) => {
+    rankDeck[key].sort(byStrength)
+    result.push(...rankDeck[key])
+  })
 
   return result.map((c, i) => c.bid * (i + 1)).reduce((a, b) => a + b, 0)
 }
@@ -154,86 +145,46 @@ const solve2 = (data: Puzzle) => {
     const jokers = hand.split("").filter((c) => c == "J").length
     const cards = hand.split("").filter((c) => c != "J").sort()
     const uLen = _.uniq(cards).length
-    
-    switch(jokers) {
-      case 5:
+
+    switch (jokers) {
       case 0:
+      case 5:
         typeName = typeKeys[getType(hand)]
         break
-
       case 4:
+        typeName = typeKeys[types.five_of_a_kind]
         break
-    }
-
-    if (jokers == 0 || jokers == 5) {
-      type = getType(hand)
-      typeName = _.keys(types)[type]
-    } else {
-
-      if (jokers == 4) {
-        type = types.five_of_a_kind
-        typeName = _.keys(types)[type]
-      }
-
-      if (jokers == 3) {
-        if (uLen == 1) {
-          type = types.five_of_a_kind
-          typeName = _.keys(types)[type]
+      case 3:
+        typeName = (uLen == 1)
+          ? typeKeys[types.five_of_a_kind]
+          : typeKeys[types.four_of_a_kind]
+        break
+      case 2:
+        typeName = (uLen == 1)
+          ? typeKeys[types.five_of_a_kind]
+          : (uLen == 2)
+          ? typeKeys[types.four_of_a_kind]
+          : typeKeys[types.three_of_a_kind]
+        break
+      case 1:
+        switch (uLen) {
+          case 4:
+            typeName = typeKeys[types.one_pair]
+            break
+          case 3:
+            typeName = typeKeys[types.three_of_a_kind]
+            break
+          case 2:
+            const t = cards.filter((c) => c == cards[0]).length
+            typeName = (t == 1 || t == 3)
+              ? typeKeys[types.four_of_a_kind]
+              : typeKeys[types.full_house]
+            break
+          case 1:
+            typeName = typeKeys[types.five_of_a_kind]
+            break
         }
-
-        if (uLen == 2) {
-          type = types.four_of_a_kind
-          typeName = _.keys(types)[type]
-        }
-      }
-
-      if (jokers == 2) {
-        if (uLen == 1) {
-          type = types.five_of_a_kind
-          typeName = _.keys(types)[type]
-        }
-
-        if (uLen == 2) {
-          type = types.four_of_a_kind
-          typeName = _.keys(types)[type]
-        }
-
-        if (uLen == 3) {
-          type = types.three_of_a_kind
-          typeName = _.keys(types)[type]
-        }
-      }
-
-      if (jokers == 1) {
-        if (uLen == 4) {
-          type = types.one_pair
-          typeName = _.keys(types)[type]
-        }
-
-        if (uLen == 3) {
-          type = types.three_of_a_kind
-          typeName = _.keys(types)[type]
-        }
-
-        if (uLen == 2) {
-          const t = cards.filter((c) => c == cards[0]).length
-
-          if (t == 1 || t == 3) {
-            type = types.four_of_a_kind
-            typeName = _.keys(types)[type]
-          }
-
-          if (t == 2) {
-            type = types.full_house
-            typeName = _.keys(types)[type]
-          }
-        }
-
-        if (uLen == 1) {
-          type = types.five_of_a_kind
-          typeName = _.keys(types)[type]
-        }
-      }
+        break
     }
 
     rankDeck[typeName].push({ hand, bid })
@@ -241,8 +192,8 @@ const solve2 = (data: Puzzle) => {
 
   const byStrength = ({ hand: a }, { hand: b }) => {
     if (a == b) return 0
-    const aSplit: string[] = a.split("").map((c: string) => strength[c])
-    const bSplit: string[] = b.split("").map((c) => strength[c])
+    const aSplit = a.split("").map((c) => strength[c])
+    const bSplit = b.split("").map((c) => strength[c])
 
     for (let i = 0; i < aSplit.length; i++) {
       if (aSplit[i] !== bSplit[i]) {
@@ -253,11 +204,10 @@ const solve2 = (data: Puzzle) => {
     return 0
   }
 
-  const keys = _.keys(rankDeck)
-  for (let k = 0; k < keys.length; k++) {
-    rankDeck[keys[k]].sort(byStrength)
-    result.push(...rankDeck[keys[k]])
-  }
+  _.keys(rankDeck).forEach((key) => {
+    rankDeck[key].sort(byStrength)
+    result.push(...rankDeck[key])
+  })
 
   return result.map((c, i) => c.bid * (i + 1)).reduce((a, b) => a + b, 0)
 }
