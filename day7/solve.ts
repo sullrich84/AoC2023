@@ -1,16 +1,25 @@
 // @deno-types="npm:@types/lodash"
-import _ from "npm:lodash"
+import _, { lowerCase } from "npm:lodash"
 import { Counter } from "../utils/counter.ts"
 import { data, Puzzle, sample } from "./data.ts"
+import { wait } from "../utils/utils.ts"
 
 console.clear()
 console.log("🎄 Day 7: YYY")
 
 const runPart1 = false
 const runPart2 = true
-const runBoth = false
+const runBoth = true
 
 /// Part 1
+type Kind =
+  | "high_card"
+  | "one_pair"
+  | "two_pair"
+  | "three_of_a_kind"
+  | "full_house"
+  | "four_of_a_kind"
+  | "five_of_a_kind"
 
 const types = {
   five_of_a_kind: 0,
@@ -20,6 +29,33 @@ const types = {
   two_pair: 4,
   one_pair: 5,
   high_card: 6,
+}
+
+const getType = (hand: string) => {
+  const uniqCards = _.uniq(hand).length
+  if (uniqCards == 1) {
+    return types.five_of_a_kind
+  }
+
+  const [a, b, c, d, e] = hand.split("").sort()
+
+  if (uniqCards == 2) {
+    return (a == b && b == c && c == d) || (b == c && c == d && d == e)
+      ? types.four_of_a_kind
+      : types.full_house
+  }
+
+  if (uniqCards == 3) {
+    return (a == b && b == c) || (b == c && c == d) || (c == d && d == e)
+      ? types.three_of_a_kind
+      : types.two_pair
+  }
+
+  if (uniqCards == 4) {
+    return types.one_pair
+  }
+
+  return types.high_card
 }
 
 const solve1 = (data: Puzzle) => {
@@ -37,33 +73,6 @@ const solve1 = (data: Puzzle) => {
     "4": 10,
     "3": 11,
     "2": 12,
-  }
-
-  const getType = (hand: string) => {
-    const uniqCards = _.uniq(hand).length
-    if (uniqCards == 1) {
-      return types.five_of_a_kind
-    }
-
-    const [a, b, c, d, e] = hand.split("").sort()
-
-    if (uniqCards == 2) {
-      return (a == b && b == c && c == d) || (b == c && c == d && d == e)
-        ? types.four_of_a_kind
-        : types.full_house
-    }
-
-    if (uniqCards == 3) {
-      return (a == b && b == c) || (b == c && c == d) || (c == d && d == e)
-        ? types.three_of_a_kind
-        : types.two_pair
-    }
-
-    if (uniqCards == 4) {
-      return types.one_pair
-    }
-
-    return types.high_card
   }
 
   let result = []
@@ -133,90 +142,7 @@ const solve2 = (data: Puzzle) => {
     "J": 12,
   }
 
-  const getType = (hand: string) => {
-    const uniqCards = _.uniq(hand).length
-    if (uniqCards == 1) {
-      return types.five_of_a_kind
-    }
-
-    const [a, b, c, d, e] = hand.split("").sort()
-    const jokers = [a, b, c, d, e].filter((c) => c == "J").length
-
-    console.log({ hand, jokers })
-
-    if (uniqCards == 2) {
-      // AAAA_ || _AAAA
-      if ((a == b && b == c && c == d) || (b == c && c == d && d == e)) {
-        // AAAAJ || JAAAA
-        if (jokers > 0) {
-          if (jokes != 1) throw "mismatch 1"
-          return types.five_of_a_kind
-        }
-
-        return types.four_of_a_kind
-      }
-
-      // JJAAA || AAAJJ
-
-      if (jokers > 0) {
-        if (jokers != 2) throw "mismatch 2"
-        return types.five_of_a_kind
-      }
-
-      // __AAA || AAA__
-      return types.full_house
-    }
-
-    if (uniqCards == 3) {
-      // AAA__ || __AAA || _AAA_
-      if ((a == b && b == c) || (b == c && c == d) || (c == d && d == e)) {
-        // J_AAA || _JAAA || AAAJ_ || AAA_J
-        if (jokers > 0) {
-          if (jokers != 1) throw "mismatch 1"
-          return types.four_of_a_kind
-        }
-
-        return types.three_of_a_kind
-      }
-
-      // AA_JJ || AAJJ_ || JJ_AA || JJAA_
-      if (jokers > 0) {
-        if (jokers == 3) {
-          return types.five_of_a_kind
-        } 
-
-        // 2 PAIR + JOKER
-
-        if (jokers == 2) {
-          return types.four_of_a_kind
-        }
-
-        if (jokers != 1) throw "mismatch 1"
-        return types.
-      }
-
-      //_AA22 || AA_22 || AA22_
-      return types.two_pair
-    }
-
-    // AA___ || _AA__ || __AA_ || ___AA
-    if (uniqCards == 4) {
-      // J__AA || _J_AA ...
-      if ((a == "J" || b == "J" || c == "J" || d == "J" || e == "J")) {
-        return types.three_of_a_kind
-      }
-
-      return types.one_pair
-    }
-
-    if ((a == "J") || (b == "J") || (c == "J") || (d == "J") || (e == "J")) {
-      return types.one_pair
-    }
-
-    return types.high_card
-  }
-
-  let result = []
+  const result = []
 
   const rankDeck = {
     high_card: [],
@@ -228,11 +154,125 @@ const solve2 = (data: Puzzle) => {
     five_of_a_kind: [],
   }
 
+  // data = []
+  // // 5
+  // data.push({ hand: "JJJJJ", bid: 1 })
+  //
+  // // 4
+  // data.push({ hand: "JJJJ4", bid: 1 })
+  //
+  // // 3
+  // data.push({ hand: "JJJ44", bid: 1 })
+  // data.push({ hand: "JJJ42", bid: 1 })
+  //
+  // // 2
+  // data.push({ hand: "JJ444", bid: 1 })
+  // data.push({ hand: "JJ443", bid: 1 })
+  // data.push({ hand: "JJ432", bid: 1 })
+  //
+  // // 1
+  // data.push({ hand: "J5555", bid: 1 })
+  // data.push({ hand: "J5552", bid: 1 })
+  // data.push({ hand: "J5522", bid: 1 })
+  // data.push({ hand: "J5523", bid: 1 })
+  // data.push({ hand: "J5432", bid: 1 })
+
+  // Two pair test
+  // data.push({ hand: "J5422", bid: 1 })
+
   data.forEach(({ hand, bid }) => {
-    const type = getType(hand)
-    const typeName = _.keys(types)[type]
+    let type, typeName
+
+    const jokers = hand.split("").filter((c) => c == "J").length
+    const cards = hand.split("").filter((c) => c != "J").sort()
+
+    if (jokers == 0 || jokers == 5) {
+      type = getType(hand)
+      typeName = _.keys(types)[type]
+    } else {
+      const uLen = _.uniq(cards).length
+
+      if (jokers == 4) {
+        type = types.five_of_a_kind
+        typeName = _.keys(types)[type]
+      }
+
+      if (jokers == 3) {
+        // 3 Joker and 1 pair
+        if (uLen == 1) {
+          type = types.five_of_a_kind
+          typeName = _.keys(types)[type]
+        }
+
+        // 3 Joker and 2 random
+        if (uLen == 2) {
+          type = types.four_of_a_kind
+          typeName = _.keys(types)[type]
+        }
+      }
+
+      if (jokers == 2) {
+        // 2 Joker and 1 tripple
+        if (uLen == 1) {
+          type = types.five_of_a_kind
+          typeName = _.keys(types)[type]
+        }
+
+        // 2 Joker 1 pair 1 random: Assign jokers to random for five_of_a_kind
+        if (uLen == 2) {
+          type = types.four_of_a_kind
+          typeName = _.keys(types)[type]
+        }
+
+        // 2 Joker 3 random
+        if (uLen == 3) {
+          type = types.three_of_a_kind
+          typeName = _.keys(types)[type]
+        }
+      }
+
+      if (jokers == 1) {
+        // 1 Joker 4 random
+        if (uLen == 4) {
+          type = types.one_pair
+          typeName = _.keys(types)[type]
+        }
+
+        // 1 Joker 1 pair 2 random
+        if (uLen == 3) {
+          type = types.three_of_a_kind
+          typeName = _.keys(types)[type]
+        }
+
+        // 1 Joker 2 pairs or 1 tripple and 1 random
+        if (uLen == 2) {
+          const t = cards.filter((c) => c == cards[0]).length
+          
+          if (t == 1 || t == 3) {
+            type = types.four_of_a_kind
+            typeName = _.keys(types)[type]
+          }
+
+          if (t == 2) {
+            type = types.full_house
+            typeName = _.keys(types)[type]
+          }
+        }
+
+        // 1 Joker 1 quad
+        if (uLen == 1) {
+          type = types.five_of_a_kind
+          typeName = _.keys(types)[type]
+        }
+      }
+    }
+
+    console.log({ jokers, hand, type, typeName })
     rankDeck[typeName].push({ hand, bid })
   })
+
+  console.log(rankDeck);
+  
 
   const byStrength = ({ hand: a }, { hand: b }) => {
     if (a == b) return 0
@@ -253,6 +293,7 @@ const solve2 = (data: Puzzle) => {
     rankDeck[keys[k]].sort(byStrength)
     result.push(...rankDeck[keys[k]])
   }
+
 
   return result.map((c, i) => c.bid * (i + 1)).reduce((a, b) => a + b, 0)
 }
