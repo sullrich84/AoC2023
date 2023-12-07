@@ -1,3 +1,5 @@
+import { colorize } from "https://deno.land/x/json_colorize/mod.ts"
+
 export class Counter {
   private _count = 0
 
