@@ -4,7 +4,7 @@ import { data, Puzzle, sample } from "./data.ts"
 import { removeOverlappingRanges } from "../utils/utils.ts"
 
 console.clear()
-console.log("🎄 Day 5: YYY")
+console.log("🎄 Day 5: If You Give A Seed A Fertilizer")
 
 const runPart1 = true
 const runPart2 = true
