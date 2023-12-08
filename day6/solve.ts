@@ -1,10 +1,6 @@
 // @deno-types="npm:@types/lodash"
-import _, { countBy } from "npm:lodash"
+import _ from "npm:lodash"
 import { data1, data2, Puzzle, sample1, sample2 } from "./data.ts"
-import { ValueStore, wait } from "../utils/utils.ts"
-import { Counter } from "../utils/counter.ts"
-// const data = Deno.readTextFileSync("./day6/task.txt")
-// const input = Deno.readTextFileSync("./day6/sample.txt")
 
 console.clear()
 console.log("🎄 Day 6: Wait For It")
@@ -17,7 +13,6 @@ const runBoth = true
 
 const solve = (data: Puzzle) => {
   const results = []
-  const counter = new Counter
 
   for (let race = 0; race < data.length; race++) {
     const ttb = data[race].ms
