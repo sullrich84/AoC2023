@@ -3,7 +3,7 @@ import _, { functions } from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
 
 console.clear()
-console.log("🎄 Day 3: YYY")
+console.log("🎄 Day 3: Gear Ratios")
 
 const runPart1 = true
 const runPart2 = true
