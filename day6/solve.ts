@@ -7,7 +7,7 @@ import { Counter } from "../utils/counter.ts"
 // const input = Deno.readTextFileSync("./day6/sample.txt")
 
 console.clear()
-console.log("🎄 Day 6: YYY")
+console.log("🎄 Day 6: Wait For It")
 
 const runPart1 = true
 const runPart2 = true
