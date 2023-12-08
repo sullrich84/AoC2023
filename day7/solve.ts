@@ -4,7 +4,7 @@ import { data, Puzzle, sample } from "./data.ts"
 import { data1 } from "../day6/data.ts"
 
 console.clear()
-console.log("🎄 Day 7: YYY")
+console.log("🎄 Day 7: Camel Cards")
 
 const runPart1 = true
 const runPart2 = true
