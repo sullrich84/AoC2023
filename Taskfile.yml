@@ -22,9 +22,17 @@ tasks:
     silent: true
     cmds:
       - |
-        echo $SESSION
         curl "https://adventofcode.com/2023/day/{{.CLI_ARGS}}/input" -H "cookie: session=$SESSION;" > day{{.CLI_ARGS}}/task.txt
       - touch day{{.CLI_ARGS}}/sample.txt
+      - task: title
+  
+  title:
+    silent: true
+    cmds:
+      - |
+        export TITLE=$(curl -s https://adventofcode.com/2023/day/{{.CLI_ARGS}} | grep -Eow "Day \d+: .+ ---" | sed -e "s/Day [0-9]*: \(.*\) ---/\1/g")
+        sed -i '' "s/YYY/$TITLE/g" day{{.CLI_ARGS}}/solve.ts
+        
   aoc:
     cmds:
       - task: add
