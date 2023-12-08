@@ -1,9 +1,7 @@
 // @deno-types="npm:@types/lodash"
-import _, { lowerCase } from "npm:lodash"
-import math, { lcm, string } from "npm:mathjs"
+import _ from "npm:lodash"
+import { lcm } from "npm:mathjs"
 import { data, Puzzle, sample1, sample2 } from "./data.ts"
-import { Counter } from "../utils/counter.ts"
-import { wait } from "../utils/utils.ts"
 
 console.clear()
 console.log("🎄 Day 8: YYY")
