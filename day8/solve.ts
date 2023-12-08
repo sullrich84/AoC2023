@@ -4,7 +4,7 @@ import { lcm } from "npm:mathjs"
 import { data, Puzzle, sample1, sample2 } from "./data.ts"
 
 console.clear()
-console.log("🎄 Day 8: YYY")
+console.log("🎄 Day 8: Haunted Wasteland")
 
 const runPart1 = true
 const runPart2 = true
