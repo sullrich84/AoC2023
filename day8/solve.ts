@@ -1,6 +1,7 @@
 // @deno-types="npm:@types/lodash"
-import _ from "npm:lodash"
-import { data, Puzzle, sample } from "./data.ts"
+import _, { lowerCase } from "npm:lodash"
+import math, { lcm, string } from "npm:mathjs"
+import { data, Puzzle, sample1, sample2 } from "./data.ts"
 import { Counter } from "../utils/counter.ts"
 import { wait } from "../utils/utils.ts"
 
@@ -8,27 +9,24 @@ console.clear()
 console.log("🎄 Day 8: YYY")
 
 const runPart1 = true
-const runPart2 = false
+const runPart2 = true
 const runBoth = true
 
 /// Part 1
 
-const solve1 = (data: Puzzle) => {
+const solve1 = ({ move, network }: Puzzle) => {
   let steps = 0
-  
-  const moves = data.move.split("")
   let pos = "AAA"
-  const target = "ZZZ"
 
-  while (pos !== target) {
-    const nMove = moves[steps++ % moves.length]
-    pos = data.network[pos][nMove]
+  while (pos !== "ZZZ") {
+    const nMove = move[steps++ % move.length]
+    pos = network[pos][nMove]
   }
 
   return steps
 }
 
-const solve1Sample = runPart1 ? solve1(sample) : "skipped"
+const solve1Sample = runPart1 ? solve1(sample1) : "skipped"
 const solve1Data = runPart1 && runBoth ? solve1(data) : "skipped"
 
 console.log("\nPart 1:")
@@ -37,10 +35,21 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-const solve2 = (data: Puzzle) => {
+const solve2 = ({ move, network }: Puzzle) => {
+  const starts = _.keys(network).filter((key) => key.charAt(2) == "A")
+  const steps = starts.map((_) => 0)
+
+  for (let [idx, aPos] of starts.entries()) {
+    while (aPos.charAt(2) !== "Z") {
+      const nMove = move[steps[idx]++ % move.length]
+      aPos = network[aPos][nMove]
+    }
+  }
+
+  return _.values(steps).reduce((c, p) => lcm(c, p), 1)
 }
 
-const solve2Sample = runPart2 ? solve2(sample) : "skipped"
+const solve2Sample = runPart2 ? solve2(sample2) : "skipped"
 const solve2Data = runPart2 && runBoth ? solve2(data) : "skipped"
 
 console.log("\nPart 2:")

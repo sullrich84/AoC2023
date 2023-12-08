@@ -3,25 +3,111 @@
   "packages": {
     "specifiers": {
       "npm:@types/lodash": "npm:@types/lodash@4.14.202",
-      "npm:lodash": "npm:lodash@4.17.21"
+      "npm:lodash": "npm:lodash@4.17.21",
+      "npm:mathjs": "npm:mathjs@12.1.0"
     },
     "npm": {
+      "@babel/runtime@7.23.5": {
+        "integrity": "sha512-NdUTHcPe4C99WxPub+K9l9tK5/lV4UXIoaHSYgzco9BCyjKAAwzdBI+wWtYqHt7LJdbo74ZjRPJgzVweq1sz0w==",
+        "dependencies": {
+          "regenerator-runtime": "regenerator-runtime@0.14.0"
+        }
+      },
       "@types/lodash@4.14.202": {
         "integrity": "sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==",
+        "dependencies": {}
+      },
+      "complex.js@2.1.1": {
+        "integrity": "sha512-8njCHOTtFFLtegk6zQo0kkVX1rngygb/KQI6z1qZxlFI3scluC+LVTCFbrkWjBv4vvLlbQ9t88IPMC6k95VTTg==",
+        "dependencies": {}
+      },
+      "decimal.js@10.4.3": {
+        "integrity": "sha512-VBBaLc1MgL5XpzgIP7ny5Z6Nx3UrRkIViUkPUdtl9aya5amy3De1gsUUSB1g3+3sExYNjCAsAznmukyxCb1GRA==",
+        "dependencies": {}
+      },
+      "escape-latex@1.2.0": {
+        "integrity": "sha512-nV5aVWW1K0wEiUIEdZ4erkGGH8mDxGyxSeqPzRNtWP7ataw+/olFObw7hujFWlVjNsaDFw5VZ5NzVSIqRgfTiw==",
+        "dependencies": {}
+      },
+      "fraction.js@4.3.4": {
+        "integrity": "sha512-pwiTgt0Q7t+GHZA4yaLjObx4vXmmdcS0iSJ19o8d/goUGgItX9UZWKWNnLHehxviD8wU2IWRsnR8cD5+yOJP2Q==",
+        "dependencies": {}
+      },
+      "javascript-natural-sort@0.7.1": {
+        "integrity": "sha512-nO6jcEfZWQXDhOiBtG2KvKyEptz7RVbpGP4vTD2hLBdmNQSsCiicO2Ioinv6UI4y9ukqnBpy+XZ9H6uLNgJTlw==",
         "dependencies": {}
       },
       "lodash@4.17.21": {
         "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         "dependencies": {}
+      },
+      "mathjs@12.1.0": {
+        "integrity": "sha512-x5wUkWo3CfXMl4mf/jHsbVNuMcUwN2m4qbj+tR/jYr9fdiIrlsexQbKYav8Uwfe+E5he30CyVaABNLmAlTFO3w==",
+        "dependencies": {
+          "@babel/runtime": "@babel/runtime@7.23.5",
+          "complex.js": "complex.js@2.1.1",
+          "decimal.js": "decimal.js@10.4.3",
+          "escape-latex": "escape-latex@1.2.0",
+          "fraction.js": "fraction.js@4.3.4",
+          "javascript-natural-sort": "javascript-natural-sort@0.7.1",
+          "seedrandom": "seedrandom@3.0.5",
+          "tiny-emitter": "tiny-emitter@2.1.0",
+          "typed-function": "typed-function@4.1.1"
+        }
+      },
+      "regenerator-runtime@0.14.0": {
+        "integrity": "sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==",
+        "dependencies": {}
+      },
+      "seedrandom@3.0.5": {
+        "integrity": "sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==",
+        "dependencies": {}
+      },
+      "tiny-emitter@2.1.0": {
+        "integrity": "sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==",
+        "dependencies": {}
+      },
+      "typed-function@4.1.1": {
+        "integrity": "sha512-Pq1DVubcvibmm8bYcMowjVnnMwPVMeh0DIdA8ad8NZY2sJgapANJmiigSUwlt+EgXxpfIv8MWrQXTIzkfYZLYQ==",
+        "dependencies": {}
       }
     }
   },
   "redirects": {
+    "https://cdn.pika.dev/big.js/^5.2.2": "https://cdn.skypack.dev/big.js@^5.2.2",
     "https://deno.land/x/json_colorize/mod.ts": "https://deno.land/x/json_colorize@0.1.0/mod.ts"
   },
   "remote": {
+    "https://cdn.skypack.dev/-/big.js@v5.2.2-sUR8fKsGHRxsJyqyvOSP/dist=es2019,mode=imports/optimized/bigjs.js": "b6d8e6af0c1f7bdc7e8cd0890819ecee2dcbb0776ec4089eae281de8ebd7b2bd",
+    "https://cdn.skypack.dev/big.js@^5.2.2": "f74e8935c06af6664d64a5534d1d6db1ab66649df8164696117ab5a1cd10714e",
     "https://deno.land/x/json_colorize@0.1.0/mod.ts": "1d0c4053ada2b4b21b635509eb30140f3a3cec05dc091fc7e615f71bb45588e4",
     "https://deno.land/x/json_colorize@0.1.0/src/colorizer.ts": "674fbce54184932e388815ea874aa996d852bb3b33f91a167ab9fa3010a715e0",
-    "https://deno.land/x/json_colorize@0.1.0/src/lexer.ts": "5180ef42f5813a7904919f441b95e9d8515a63cd66781e9dd731e9e69115791f"
+    "https://deno.land/x/json_colorize@0.1.0/src/lexer.ts": "5180ef42f5813a7904919f441b95e9d8515a63cd66781e9dd731e9e69115791f",
+    "https://deno.land/x/math@v1.1.0/abs.ts": "d64fe603ae4bb57037f06a1a5004285b99ed016dab6bfcded07c8155efce24b7",
+    "https://deno.land/x/math@v1.1.0/big/mod.ts": "ba561f56a24ecc9f03542693ed0c81166ed0c921f8017d220ec70c963e935509",
+    "https://deno.land/x/math@v1.1.0/div.ts": "5dda45b8bb5c1f778f2cfb28cbee648c5c7aa818f915acce336651fd13994f07",
+    "https://deno.land/x/math@v1.1.0/eq.ts": "145727b71b5bdd993c5d44fd9c9089419dac508527ef3812c590aabcd943236c",
+    "https://deno.land/x/math@v1.1.0/gt.ts": "6e493f3cc2ecd9be244bb67dde28b1d5ec4d4218747fc9efd6f551a52093aaf7",
+    "https://deno.land/x/math@v1.1.0/gte.ts": "4eddc58c2b79315974c328d92b512e133796d785e1f570f9e8d232e32d620e66",
+    "https://deno.land/x/math@v1.1.0/lt.ts": "999e4d118c9a5e8e653bd34a32ef532634a68e0dd4ba6a200ad35cc7fd9ceb31",
+    "https://deno.land/x/math@v1.1.0/lte.ts": "637c12db7307d33024054d9671f4f932a42dbaad4c60559c47be17c94f39eb1e",
+    "https://deno.land/x/math@v1.1.0/matrix/eye.ts": "b7b060fc60a6f4ae4e3caa82e5a094cd622bd8519f67ad81e305b197a9d19d1c",
+    "https://deno.land/x/math@v1.1.0/matrix/identity.ts": "00246e8133f2fac4a1481af7390907cc4cf3e8415a00d29a1e0beb47bdd81074",
+    "https://deno.land/x/math@v1.1.0/matrix/matrix.ts": "2b80cd4fb8aa0ab9eca31cf6eb1037a2885f37ae7f84e1b7f050fa831089e937",
+    "https://deno.land/x/math@v1.1.0/matrix/mod.ts": "123212ccd86007864c3400ca3deaa998c7e9453b77538094d06edc1add50f199",
+    "https://deno.land/x/math@v1.1.0/max.ts": "bf646a3553e8800de240fad977eabbef365c388d33f79ef6fb5f015d8d7ff104",
+    "https://deno.land/x/math@v1.1.0/min.ts": "9a617f3b2c76045f9169324787399cb709eba81fae8dbd4ff540336ea82eb470",
+    "https://deno.land/x/math@v1.1.0/minus.ts": "e64bfe637c5d5c790f40dd6681b206dc9996303daacb6cd1533e7dc1969acda6",
+    "https://deno.land/x/math@v1.1.0/mod.ts": "85f6d29ba8faaae2fb24c4ac3f5772474f1452ee27068714521a7c9aabfd1ee6",
+    "https://deno.land/x/math@v1.1.0/modulo.ts": "c83ebdc4f4c9ddabf64ade595802502f2333220b1f59010457f4064e4bb94e6c",
+    "https://deno.land/x/math@v1.1.0/plus.ts": "8d500d86c8f27acc9a754f636c530abe17bdb8f240aea2ece4b29e86ca121f40",
+    "https://deno.land/x/math@v1.1.0/pow.ts": "47120d27e42fce01572340e724de26039beef6daae25133029af6df6fa7dec4c",
+    "https://deno.land/x/math@v1.1.0/round.ts": "1b54a5d440f9a0d44d4ff8ba000f59b4895c37a1b2c2aaf5ec59a5fe8081e308",
+    "https://deno.land/x/math@v1.1.0/sqrt.ts": "50d94b4d1d9077f887eec904d73cf5439c1ef4b724d1949414ba5ec7fb9343b3",
+    "https://deno.land/x/math@v1.1.0/sum.ts": "6a0fddf3b50a965c79d96edc7fe2e146d4a95915fce90928fb4068abe9d8f059",
+    "https://deno.land/x/math@v1.1.0/times.ts": "7359e88b8456fc121bdb800543712d637e0ca260777aa1bb0d43724fe576222e",
+    "https://deno.land/x/math@v1.1.0/to_exponential.ts": "9038215c1cfd430acb835ca5e9c967f1a9da8d0658f7eeab8852662b201596d4",
+    "https://deno.land/x/math@v1.1.0/to_fixed.ts": "3702a47b14950a9d37f13147e1340b5a3f5f07183d480af59fcdf9d10bb6084e",
+    "https://deno.land/x/math@v1.1.0/to_precision.ts": "b7fb70b79649c9fd48f3747d285a5086e457487986c0f395a8275302e13a9b5e"
   }
 }
