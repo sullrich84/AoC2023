@@ -9,9 +9,9 @@ import { wait } from "../utils/utils.ts"
 console.clear()
 console.log("🎄 Day 9: Mirage Maintenance")
 
-const runPart1 = true
-const runPart2 = false
-const runBoth = true
+const runPart1 = false
+const runPart2 = true
+const runBoth = false
 
 /// Part 1
 
@@ -19,7 +19,6 @@ const solve1 = (data: Puzzle) => {
   let sum = 0
 
   for (const [r, row] of data.entries()) {
-    // const rowDiff = row.slice(0, row.length - 1).map((n, i) => row[i + 1] - n)
     const seq: number[][] = [row]
     let allZero = false
 
@@ -31,20 +30,13 @@ const solve1 = (data: Puzzle) => {
     }
 
     const rSeq = [...seq].reverse()
-
     for (let i = 0; i < rSeq.length - 1; i++) {
       const add = _.last(rSeq[i + 1]) + _.last(rSeq[i])
-      // console.log({add, rSeq: rSeq[i]}); 
       rSeq[i + 1].push(add)
     }
 
-    const lastHistory = _.last(_.last(rSeq));
-    console.log("-->", lastHistory);
+    const lastHistory = _.last(_.last(rSeq))
     sum += lastHistory
-    // console.log(add);
-
-    // console.log({ len: seq.length, seq })
-    // return
   }
 
   return sum
@@ -60,6 +52,30 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
+  let sum = 0
+
+  for (const [r, row] of data.entries()) {
+    const seq: number[][] = [row]
+    let allZero = false
+
+    while (allZero == false) {
+      const cur = _.last(seq)
+      const diff = cur.slice(0, cur.length - 1).map((n, i) => cur[i + 1] - n)
+      seq.push(diff)
+      allZero = !diff.find((n) => n != 0)
+    }
+
+    const rSeq = [...seq].reverse()
+    for (let i = 0; i < rSeq.length - 1; i++) {
+      const add = _.last(rSeq[i + 1]) + _.last(rSeq[i])
+      rSeq[i + 1].push(add)
+    }
+
+    const lastHistory = _.last(_.last(rSeq))
+    sum += lastHistory
+  }
+
+  return sum
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
