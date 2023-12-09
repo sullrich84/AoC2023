@@ -1,49 +1,36 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { data, Puzzle, sample } from "./data.ts"
-import { all, log, rightLogShiftDependencies } from "npm:mathjs"
-import { wait } from "../utils/utils.ts"
-// const data = Deno.readTextFileSync("./day9/task.txt")
-// const input = Deno.readTextFileSync("./day9/sample.txt")
 
 console.clear()
 console.log("🎄 Day 9: Mirage Maintenance")
 
-const runPart1 = false
+const runPart1 = true
 const runPart2 = true
-const runBoth = false
+const runBoth = true
 
 /// Part 1
 
-const solve1 = (data: Puzzle) => {
-  let sum = 0
+const solve = (data: Puzzle, backwards: boolean) =>
+  data.map((row) => {
+    const seq = [backwards ? row.reverse() : row]
 
-  for (const [r, row] of data.entries()) {
-    const seq: number[][] = [row]
-    let allZero = false
-
-    while (allZero == false) {
-      const cur = _.last(seq)
-      const diff = cur.slice(0, cur.length - 1).map((n, i) => cur[i + 1] - n)
-      seq.push(diff)
-      allZero = !diff.find((n) => n != 0)
+    while (true) {
+      const cur = _.first(seq)!
+      seq.unshift(cur.slice(0, cur.length - 1).map((n, i) => cur[i + 1] - n))
+      if (!cur.find((n) => n != 0)) break
     }
 
-    const rSeq = [...seq].reverse()
-    for (let i = 0; i < rSeq.length - 1; i++) {
-      const add = _.last(rSeq[i + 1]) + _.last(rSeq[i])
-      rSeq[i + 1].push(add)
+    for (let i = 0; i < seq.length - 1; i++) {
+      const add = _.last(seq[i + 1])! + _.last(seq[i])!
+      seq[i + 1].push(add)
     }
 
-    const lastHistory = _.last(_.last(rSeq))
-    sum += lastHistory
-  }
+    return _.last(_.last(seq))
+  }).reduce((p, c) => p! + c!, 0)
 
-  return sum
-}
-
-const solve1Sample = runPart1 ? solve1(sample) : "skipped"
-const solve1Data = runPart1 && runBoth ? solve1(data) : "skipped"
+const solve1Sample = runPart1 ? solve(sample, false) : "skipped"
+const solve1Data = runPart1 && runBoth ? solve(data, false) : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
@@ -51,35 +38,8 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-const solve2 = (data: Puzzle) => {
-  let sum = 0
-
-  for (const [r, row] of data.entries()) {
-    const seq: number[][] = [row]
-    let allZero = false
-
-    while (allZero == false) {
-      const cur = _.last(seq)
-      const diff = cur.slice(0, cur.length - 1).map((n, i) => cur[i + 1] - n)
-      seq.push(diff)
-      allZero = !diff.find((n) => n != 0)
-    }
-
-    const rSeq = [...seq].reverse()
-    for (let i = 0; i < rSeq.length - 1; i++) {
-      const add = _.last(rSeq[i + 1]) + _.last(rSeq[i])
-      rSeq[i + 1].push(add)
-    }
-
-    const lastHistory = _.last(_.last(rSeq))
-    sum += lastHistory
-  }
-
-  return sum
-}
-
-const solve2Sample = runPart2 ? solve2(sample) : "skipped"
-const solve2Data = runPart2 && runBoth ? solve2(data) : "skipped"
+const solve2Sample = runPart2 ? solve(sample, true) : "skipped"
+const solve2Data = runPart2 && runBoth ? solve(data, true) : "skipped"
 
 console.log("\nPart 2:")
 console.log("Sample:\t", solve2Sample)
