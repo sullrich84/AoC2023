@@ -1,8 +1,17 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
-// import {data, sample, Puzzle } from "./data.ts"
-const data = Deno.readTextFileSync("./day{DAY}/task.txt")
-const input = Deno.readTextFileSync("./day{DAY}/sample.txt")
+import {data, sample, Puzzle } from "./data.ts"
+
+// import { read } from "../utils/Reader.ts"
+//
+// type Puzzle = number[][]
+//
+// const [task, sample] = read("{DAY}").map((file) =>
+//   file.split("\n")
+// )
+// const data = Deno.readTextFileSync("./day{DAY}/task.txt")
+// const input = Deno.readTextFileSync("./day{DAY}/sample.txt")
+//
 
 console.clear()
 console.log("🎄 Day {DAY}: YYY")
