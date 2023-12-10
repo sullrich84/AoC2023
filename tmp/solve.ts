@@ -6,8 +6,8 @@ import {data, sample, Puzzle } from "./data.ts"
 //
 // type Puzzle = number[][]
 //
-// const [task, sample] = read("{DAY}").map((file) =>
-//   file.split("\n")
+// const [task, sample] = read("day{DAY}").map((file) =>
+//   _.initial(file.split("\n"))
 // )
 // const data = Deno.readTextFileSync("./day{DAY}/task.txt")
 // const input = Deno.readTextFileSync("./day{DAY}/sample.txt")
