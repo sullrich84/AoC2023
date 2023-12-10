@@ -1,5 +1,5 @@
 // @deno-types="npm:@types/lodash"
-import _ from "npm:lodash"
+import _, { cloneDeep } from "npm:lodash"
 import { read } from "../utils/Reader.ts"
 
 type Puzzle = string[][]

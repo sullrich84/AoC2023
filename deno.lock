@@ -4,7 +4,8 @@
     "specifiers": {
       "npm:@types/lodash": "npm:@types/lodash@4.14.202",
       "npm:lodash": "npm:lodash@4.17.21",
-      "npm:mathjs": "npm:mathjs@12.1.0"
+      "npm:mathjs": "npm:mathjs@12.1.0",
+      "npm:pngjs": "npm:pngjs@7.0.0"
     },
     "npm": {
       "@babel/runtime@7.23.5": {
@@ -54,6 +55,10 @@
           "tiny-emitter": "tiny-emitter@2.1.0",
           "typed-function": "typed-function@4.1.1"
         }
+      },
+      "pngjs@7.0.0": {
+        "integrity": "sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==",
+        "dependencies": {}
       },
       "regenerator-runtime@0.14.0": {
         "integrity": "sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==",
@@ -112,6 +117,12 @@
     "https://deno.land/std@0.208.0/assert/unimplemented.ts": "d56fbeecb1f108331a380f72e3e010a1f161baa6956fd0f7cf3e095ae1a4c75a",
     "https://deno.land/std@0.208.0/assert/unreachable.ts": "4600dc0baf7d9c15a7f7d234f00c23bca8f3eba8b140286aaca7aa998cf9a536",
     "https://deno.land/std@0.208.0/fmt/colors.ts": "34b3f77432925eb72cf0bfb351616949746768620b8e5ead66da532f93d10ba2",
+    "https://deno.land/x/base64@v0.2.0/base.ts": "5c03afb3d48787006eb15dba6aa3045f65d4da8be80573fc7731c8d9b187a27d",
+    "https://deno.land/x/base64@v0.2.0/mod.ts": "ce11310ed3fb379a673ec7b928019b412a98ec9bf17266469cb73a2249ae9dd3",
+    "https://deno.land/x/dpng@0.7.5/deps.ts": "9d8186a7e31c072b7d6fe576342837ba278a61c3805d5479fcafc814a493d995",
+    "https://deno.land/x/dpng@0.7.5/lib/Image.ts": "e9e1a802ccaff676c48217f1c1342e718021990091478f0295f726387cdf7c03",
+    "https://deno.land/x/dpng@0.7.5/lib/PNGImage.ts": "055454fcd72c5de2d264b8bf4a9b579f7a2ab2f28f49088492be3de60ae4aecf",
+    "https://deno.land/x/dpng@0.7.5/mod.ts": "b5709d90d61b39b9fa4f9b18c614dfdfce39a20e84ba38f2c26d216dd14311ed",
     "https://deno.land/x/json_colorize@0.1.0/mod.ts": "1d0c4053ada2b4b21b635509eb30140f3a3cec05dc091fc7e615f71bb45588e4",
     "https://deno.land/x/json_colorize@0.1.0/src/colorizer.ts": "674fbce54184932e388815ea874aa996d852bb3b33f91a167ab9fa3010a715e0",
     "https://deno.land/x/json_colorize@0.1.0/src/lexer.ts": "5180ef42f5813a7904919f441b95e9d8515a63cd66781e9dd731e9e69115791f",
