@@ -1,8 +1,6 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { read } from "../utils/Reader.ts"
-import { e, hasNumericValue, i, log } from "npm:mathjs"
-import { wait } from "../utils/utils.ts"
 
 type Puzzle = string[][]
 
@@ -43,15 +41,21 @@ const solve1 = (data: Puzzle) => {
     }
   }
 
+  type StackItem = {
+    dir: "T" | "B" | "L" | "R"
+    pos: [number, number]
+    step: number
+  }
+
   // Initialize stack with instructions to follow
   // both directions from the starting point
-  const stack = []
+  const stack: StackItem[] = []
   for (const [dir, [dy, dx]] of _.entries(dirs)) {
     const [ny, nx] = [cy + dy, cx + dx]
     const nt = data[cy + dy][cx + dx]
     if (link[nt] && link[nt][dir]) {
       stack.push({
-        last: [cy, cx, dir],
+        dir,
         pos: [ny, nx],
         step: 0,
       })
@@ -59,10 +63,9 @@ const solve1 = (data: Puzzle) => {
   }
 
   // Move through stack and check if position has been visited before
-  const seen = {}
+  const seen: { [key: string]: [number, number] } = {}
   while (stack.length > 0) {
-    const { last, pos, step } = stack.pop()
-    const [lpy, lpx, lastDir] = last
+    const { dir, pos, step } = stack.pop()!
     const [cy, cx] = pos
 
     // Check if field has been entered before
@@ -74,12 +77,12 @@ const solve1 = (data: Puzzle) => {
     const t = data[cy][cx]
 
     // Move on to next field
-    const dir = link[t][lastDir]
-    const [dy, dx] = dirs[dir]
+    const nDir = link[t][dir]
+    const [dy, dx] = dirs[nDir]
     const [ny, nx] = [cy + dy, cx + dx]
 
     stack.unshift({
-      last: [cy, cx, dir],
+      dir: nDir,
       pos: [ny, nx],
       step: step + 1,
     })
