@@ -9,7 +9,8 @@
     "day6": "deno run --allow-read --watch day6/solve.ts",
     "day7": "deno run --allow-read --watch day7/solve.ts",
     "day8": "deno run --allow-read --watch day8/solve.ts",
-    "day9": "deno run --allow-read --watch day9/solve.ts"
+    "day9": "deno run --allow-read --watch day9/solve.ts",
+    "day10": "deno run --allow-read --watch day10/solve.ts"
   },
   "fmt": {
     "semiColons": false,
