@@ -59,14 +59,12 @@ const solve = (data: Puzzle, expasion: number) => {
 
     const yDiff = _.range(Math.min(sy, ty), Math.max(sy, ty))
     const xDiff = _.range(Math.min(sx, tx), Math.max(sx, tx))
-    const mDiff = Math.abs(sy - ty) + Math.abs(sx - tx)
 
     const yr = _.range(_.min([sy, ty]), _.max([sy, ty]))
     const xr = _.range(_.min([sx, tx]), _.max([sx, tx]))
 
-    let diff = 0
-    diff += _.sum(yr.map((y) => empty.row[y] ? expasion : 1))
-    diff += _.sum(xr.map((x) => empty.col[x] ? expasion : 1))
+    let diff = _.sum(yr.map((y) => empty.row[y] ? expasion : 1)) +
+      _.sum(xr.map((x) => empty.col[x] ? expasion : 1))
 
     paths.push(diff)
   }
