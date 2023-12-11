@@ -9,53 +9,38 @@ type Puzzle = string[][]
 const [task, sample] = read("day11").map((file) =>
   _.initial(file.split("\n").map((l) => l.split("")))
 )
-const data = Deno.readTextFileSync("./day11/task.txt")
-const input = Deno.readTextFileSync("./day11/sample.txt")
 
 console.clear()
 console.log("🎄 Day 11: Cosmic Expansion")
 
 const runPart1 = true
-const runPart2 = false
-const runBoth = false
+const runPart2 = true
+const runBoth = true
 
 /// Part 1
 
-const solve1 = (data: Puzzle) => {
+const solve = (data: Puzzle, expasion: number) => {
   const [ym, xm] = [data.length, data[0].length]
-  const gMap: string[][] = _.cloneDeep(data)
 
-  // Calculate gavitational force
-  for (let y = 0; y < ym; y++) {
-    for (let x = 0; x < xm; x++) {
-      if (data[y][x] != ".") continue
-      const col = _.times(ym, (ty) => data[ty][x])
-      const row = _.times(xm, (tx) => data[y][tx])
-      const g = _.union(col, row).length == 1 ? 2 : 1
-
-      _.times(ym, (ty) => {
-        if (gMap[ty][x] == "." || gMap[ty][x] == "1") {
-          gMap[ty][x] = parseInt(g)
-        }
-      })
-
-      _.times(xm, (tx) => {
-        if (gMap[y][tx] == "." || gMap[y][tx] == "1") {
-          gMap[y][tx] = parseInt(g)
-        }
-      })
+  const emptyRows = []
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].every((t) => t == ".")) {
+      emptyRows.push(i)
     }
   }
 
-  // for (const line of gMap) {
-  //   console.log(line.join(""))
-  // }
+  const emptyCols = []
+  for (let i = 0; i < data[0].length; i++) {
+    if (data.every((t) => t[i] == ".")) {
+      emptyCols.push(i)
+    }
+  }
 
   const galaxies = []
   let galaxyCounter = 0
   for (let y = 0; y < ym; y++) {
     for (let x = 0; x < xm; x++) {
-      const pos = gMap[y][x]
+      const pos = data[y][x]
       if (pos != "#") continue
       galaxies.push({ id: ++galaxyCounter, y, x })
     }
@@ -72,21 +57,26 @@ const solve1 = (data: Puzzle) => {
   for (const [start, target] of pairs) {
     const { id: sid, y: sy, x: sx } = start
     const { id: tid, y: ty, x: tx } = target
-    const manhattanDistance = Math.abs(ty - sy) + Math.abs(tx - sx)
+
+    const yDiff = _.range(Math.min(sy, ty), Math.max(sy, ty))
+    const xDiff = _.range(Math.min(sx, tx), Math.max(sx, tx))
+    const mDiff = Math.abs(sy - ty) + Math.abs(sx - tx)
 
     const yr = _.range(_.min([sy, ty]), _.max([sy, ty]))
     const xr = _.range(_.min([sx, tx]), _.max([sx, tx]))
 
-    console.log({ start, target, yr, xr })
+    let diff = 0
+    diff += _.sum(yr.map((y) => _.includes(emptyRows, y) ? expasion : 1))
+    diff += _.sum(xr.map((x) => _.includes(emptyCols, x) ? expasion : 1))
 
-    paths.push(manhattanDistance)
+    paths.push(diff)
   }
 
-  return paths
+  return _.sum(paths)
 }
 
-const solve1Sample = runPart1 ? solve1(sample) : "skipped"
-const solve1Data = runPart1 && runBoth ? solve1(data) : "skipped"
+const solve1Sample = runPart1 ? solve(sample, 2) : "skipped"
+const solve1Data = runPart1 && runBoth ? solve(task, 2) : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
@@ -94,11 +84,8 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-const solve2 = (data: Puzzle) => {
-}
-
-const solve2Sample = runPart2 ? solve2(sample) : "skipped"
-const solve2Data = runPart2 && runBoth ? solve2(data) : "skipped"
+const solve2Sample = runPart2 ? solve(sample, 10) : "skipped"
+const solve2Data = runPart2 && runBoth ? solve(task, 1_000_000) : "skipped"
 
 console.log("\nPart 2:")
 console.log("Sample:\t", solve2Sample)
