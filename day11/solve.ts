@@ -54,8 +54,8 @@ const solve = (data: Puzzle, expasion: number) => {
 
   const paths = []
   for (const [start, target] of pairs) {
-    const { id: sid, y: sy, x: sx } = start
-    const { id: tid, y: ty, x: tx } = target
+    const { y: sy, x: sx } = start
+    const { y: ty, x: tx } = target
 
     const yDiff = _.range(Math.min(sy, ty), Math.max(sy, ty))
     const xDiff = _.range(Math.min(sx, tx), Math.max(sx, tx))
