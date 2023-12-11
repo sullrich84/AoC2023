@@ -21,18 +21,17 @@ const runBoth = true
 
 const solve = (data: Puzzle, expasion: number) => {
   const [ym, xm] = [data.length, data[0].length]
+  const empty = { row: {}, col: {} }
 
-  const emptyRows = []
   for (let i = 0; i < data.length; i++) {
     if (data[i].every((t) => t == ".")) {
-      emptyRows.push(i)
+      empty.row[i] = true
     }
   }
 
-  const emptyCols = []
   for (let i = 0; i < data[0].length; i++) {
     if (data.every((t) => t[i] == ".")) {
-      emptyCols.push(i)
+      empty.col[i] = true
     }
   }
 
@@ -66,8 +65,8 @@ const solve = (data: Puzzle, expasion: number) => {
     const xr = _.range(_.min([sx, tx]), _.max([sx, tx]))
 
     let diff = 0
-    diff += _.sum(yr.map((y) => _.includes(emptyRows, y) ? expasion : 1))
-    diff += _.sum(xr.map((x) => _.includes(emptyCols, x) ? expasion : 1))
+    diff += _.sum(yr.map((y) => empty.row[y] ? expasion : 1))
+    diff += _.sum(xr.map((x) => empty.col[x] ? expasion : 1))
 
     paths.push(diff)
   }
