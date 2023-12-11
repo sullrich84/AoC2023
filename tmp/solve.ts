@@ -1,17 +1,15 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
-import {data, sample, Puzzle } from "./data.ts"
+// import {data, sample, Puzzle } from "./data.ts"
 
-// import { read } from "../utils/Reader.ts"
-//
-// type Puzzle = number[][]
-//
-// const [task, sample] = read("day{DAY}").map((file) =>
-//   _.initial(file.split("\n"))
-// )
-// const data = Deno.readTextFileSync("./day{DAY}/task.txt")
-// const input = Deno.readTextFileSync("./day{DAY}/sample.txt")
-//
+import { read } from "../utils/Reader.ts"
+
+type Puzzle = string[][]
+
+const [task, sample] = read("day{DAY}").map((file) =>
+  _.initial(file.split("\n").map(line => line.split("")))
+)
+
 
 console.clear()
 console.log("🎄 Day {DAY}: YYY")
@@ -24,10 +22,13 @@ const runBoth = false
 
 const solve1 = (data: Puzzle) => {
   // TEMPLATE
+  for(const row in data) {
+    console.log(row.join(""))
+  }
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
-const solve1Data = runPart1 && runBoth ? solve1(data) : "skipped"
+const solve1Data = runPart1 && runBoth ? solve1(task) : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
@@ -40,7 +41,7 @@ const solve2 = (data: Puzzle) => {
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
-const solve2Data = runPart2 && runBoth ? solve2(data) : "skipped"
+const solve2Data = runPart2 && runBoth ? solve2(task) : "skipped"
 
 console.log("\nPart 2:")
 console.log("Sample:\t", solve2Sample)
