@@ -24,7 +24,7 @@ const solve1 = (data: Puzzle) => {
 
   function count(line: string, groups: number[]) {
     if (line == "") {
-      // Valid -> All chars matched to groups and no groups left 
+      // Valid -> All chars matched to groups and no groups left
       // Invalid -> All chars matched to groups but groups left
       return groups.length == 0 ? 1 : 0
     }
@@ -52,7 +52,7 @@ const solve1 = (data: Puzzle) => {
     if (char == "." || char == "?") {
       result += count(nextLine, groups)
     }
- 
+
     if (char == "#" || char == "?") {
       // The remaining line has not enough chars to match
       // the amout of chars required for this group.
@@ -76,8 +76,8 @@ const solve1 = (data: Puzzle) => {
 
   let total = 0
 
-  for (const [cfg, nums] of data) {
-    total += count(cfg, nums)
+  for (const [line, groups] of data) {
+    total += count(line, groups)
   }
 
   return total
