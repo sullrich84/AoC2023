@@ -19,7 +19,7 @@ const runBoth = true
 
 /// Part 1
 
-// All credits to hyper-neutrino
+// NOTE: Actually not my solution. All credits to hyper-neutrino!
 const solve1 = (data: Puzzle) => {
   const seen: { [key: string]: number } = {}
 
