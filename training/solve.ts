@@ -39,10 +39,10 @@ const solve1 = (data: Puzzle) => {
     [0, -1],  // Left
     [0, 1],   // Right
     [1, 0],   // Down
-    // [-1, -1], // Diagonal Up-Left
-    // [-1, 1],  // Diagonal Up-Right
-    // [1, -1],  // Diagonal Down-Left
-    // [1, 1],   // Diagonal Down-Right
+    [-1, -1], // Diagonal Up-Left
+    [-1, 1],  // Diagonal Up-Right
+    [1, -1],  // Diagonal Down-Left
+    [1, 1],   // Diagonal Down-Right
   ]
 
   let minPath = []
@@ -75,10 +75,10 @@ const solve1 = (data: Puzzle) => {
   }
 
   minPath.forEach(([y, x]) => {
-    data[y][x] = "X"
+    data[y][x] = "•"
   })
 
-  data.forEach((row) => console.log(row.join("")))
+  data.forEach((row) => console.log(row.join("").replaceAll(".", " ")))
   return minPath.length
 }
 
