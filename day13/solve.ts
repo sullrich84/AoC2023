@@ -1,136 +1,84 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { Puzzle, sample, task } from "./data.ts"
-import { wait } from "../utils/utils.ts"
-
-type Puzzle = string[][]
 
 console.clear()
 console.log("🎄 Day 13: Point of Incidence")
 
 const runPart1 = true
-const runPart2 = false
+const runPart2 = true
 const runBoth = true
+
+function transpose(field: string[]) {
+  const transposed = _.unzip(field.map((row) => row.split("")))
+  return transposed.map((col) => col.join(""))
+}
+
+function sliceHorizontal(field: string[], row: number) {
+  const aboveRows = _.slice(field, 0, row)
+  const belowRows = _.slice(field, row)
+  return [aboveRows.reverse(), belowRows]
+}
+
+function hasHorizontalMirror(field: string[], avoid = 0) {
+  let result = 0
+
+  for (const [row] of field.entries()) {
+    // For part 2 we already know a matching horizontal line
+    // Avoid the known line to avoid falsified results
+    if (row === avoid) continue
+
+    // Split fields in two slices 
+    const [above, below] = sliceHorizontal(field, row)
+    const [a, b] = [above.join(""), below.join("")]
+
+    // Bring both rows to same length 
+    const range = Math.min(a.length, b.length)
+    const aNorm = a.substring(0, range)
+    const bNorm = b.substring(0, range)
+
+    if (aNorm == bNorm) result = row
+  }
+
+  return result
+}
+
+function toggleChar(str: string, pos: number) {
+  const rep = str.charAt(pos) === "#" ? "." : "#"
+  return str.substring(0, pos) + rep + str.substring(pos + 1)
+}
+
+function hasMirror(field: string[], findOther = false): number {
+  const v = hasHorizontalMirror(transpose(field))
+  const h = hasHorizontalMirror(field)
+  const [ym, xm] = [field.length, field[0].length]
+
+  // Skip here for part 1
+  if (!findOther) return v + h * 100
+
+  for (const y of _.range(0, ym)) {
+    for (const x of _.range(0, xm)) {
+      const otherField = _.cloneDeep(field)
+      otherField[y] = toggleChar(field[y], x)
+
+      const ov = hasHorizontalMirror(transpose(otherField), v)
+      const oh = hasHorizontalMirror(otherField, h)
+
+      if (ov > 0 || oh > 0) {
+        // We found another reflection
+        return ov + oh * 100
+      }
+    }
+  }
+
+  throw "No other reflection found"
+}
 
 /// Part 1
 
 const solve1 = (data: Puzzle) => {
-  // console.log(data)
-  let res = 0
-  console.clear()
-  console.log("----------------------------")
-  let leftCols = 0
-  let aboveRows = 0
-
-  // data = [data[0]]
-
-  // data = [[
-  //   "###..##.####..###",
-  //   "###..##.####..###",
-  //   "##..###.#.#...###",
-  //   "#.#.#..##..####.#",
-  //   "#.#..#...#..###..",
-  //   "..#....####.#.###",
-  //   "#..#...##.###.#..",
-  //   ".###......####.##",
-  //   "#..#.#...########",
-  // ]]
-
-  data = [[
-    "###..#....#####..",
-    ".#........#.#.###",
-    ".#........#.#.###",
-    "###..#....#####..",
-    "#.#.#####....####",
-    ".#.###..####.#..#",
-    "#..#..#.####...#.",
-    "#..#..#.####...#.",
-    ".#.###..##.#.#..#",
-  ]]
-
-  function rev(val: string) {
-    return val.split("").reverse().join("")
-  }
-
-  for (const [fId, field] of data.entries()) {
-    // console.log(field)
-
-    // Scan for vertical matches
-    let vMatches = 0
-    for (let x = 1; x < field[0].length - 1; x++) {
-      // Check if current col matches previous left
-      const xm = field[0].length
-      const col = field.map((f) => f[x]).join("")
-      const pCol = field.map((f) => f[x - 1]).join("")
-
-      if (col == pCol) {
-        // Check for mirror match
-        const xRange = Math.min(xm - x, x)
-
-        const cols = field.map((f) => f.substr(x - xRange, xRange))
-        const pCols = field.map((f) => rev(f.substr(x, xRange)))
-
-        const zips = _.zip(cols, pCols).map(([l, r]) => [l, r, l == r])
-        const allMatch = zips.map((z) => z[2]).reduce((p, c) => p && c, true)
-
-        if (allMatch) {
-          vMatches = x
-        }
-      }
-    }
-
-    if (vMatches > 0) {
-      console.log(`Vertical match found on field ${fId} on col ${vMatches}`)
-    }
-
-    // Scan for horizontal matches
-    let hMatches = 0
-    for (let y = 1; y < field.length - 1; y++) {
-      // Check if current row matches previous above
-      const ym = field.length
-      const row = field[y]
-      const pRow = field[y - 1]
-
-      if (row == pRow) {
-        // Check for mirror match
-        const yRange = Math.min(ym - y, y)
-
-        const rows = field.slice(y, y + yRange) // f.substr(x - xRange, xRange))
-        const pRows = field.slice(y - yRange, y).toReversed() // rev(f.substr(x, xRange)))
-
-        const zips = _.zip(rows, pRows).map(([l, r]) => [l, r, l == r])
-        const allMatch = zips.map((z) => z[2]).reduce((p, c) => p && c, true)
-
-        console.log({y, yRange, allMatch})
-        console.log(rows)
-        console.log(pRows)
-
-        wait()
-        if (allMatch) {
-          hMatches = y
-        }
-      }
-    }
-
-    if (hMatches > 0) {
-      console.log(`Horizontal match found on field ${fId} on row ${hMatches}`)
-    }
-
-    leftCols += vMatches
-    aboveRows += hMatches
-    // console.log(vMatches, hMatches)
-    // wait()
-    // for (let y = 1; y < field.length - 1; y++) {
-    //   for (let x = 1; x < field[0].length - 1; x++) {
-    //     console.log({ y, x })
-    //   }
-    // }
-  }
-
-  return leftCols + (aboveRows * 100)
+  return _.sum(data.map((field) => hasMirror(field, false)))
 }
-
-// > 23616
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
 const solve1Data = runPart1 && runBoth ? solve1(task) : "skipped"
@@ -142,6 +90,7 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
+  return _.sum(data.map((field) => hasMirror(field, true)))
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
