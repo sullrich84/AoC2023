@@ -22,7 +22,7 @@ function sliceHorizontal(field: string[], row: number) {
 
 function strDiff(a: string, b: string) {
   const zip = _.zip(a.split(""), b.split(""))
-  return _.sum(zip.map(([a, b]) => a != b ? 1 : 0))
+  return _.sum(zip.map(([a, b]) => a !== b ? 1 : 0))
 }
 
 function hasHorizontalMirror(field: string[], skip = 0, unsmudge = false) {
@@ -42,8 +42,8 @@ function hasHorizontalMirror(field: string[], skip = 0, unsmudge = false) {
     const aNorm = a.substring(0, range)
     const bNorm = b.substring(0, range)
 
-    if (unsmudge && strDiff(aNorm, bNorm) == 1) return row
-    if (aNorm == bNorm) result = row
+    if (unsmudge && strDiff(aNorm, bNorm) === 1) return row
+    if (aNorm === bNorm) result = row
   }
 
   return result
