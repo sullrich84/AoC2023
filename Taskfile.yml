@@ -37,3 +37,7 @@ tasks:
     cmds:
       - task: add
       - task: fetch
+
+  repl: 
+    cmd: deno repl --eval 'import _ from "npm:lodash"'
+ 

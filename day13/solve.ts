@@ -20,13 +20,22 @@ function sliceHorizontal(field: string[], row: number) {
   return [aboveRows.reverse(), belowRows]
 }
 
-function hasHorizontalMirror(field: string[], avoid = 0) {
+function strDiff(a: string, b: string) {
+  const zip = _.zip(a.split(""), b.split(""))
+  return _.sum(zip.map((e) => e[0] !== e[1] ? 1 : 0))
+}
+
+function hasHorizontalMirror(
+  field: string[],
+  skipRow = 0,
+  diffTolerance = false,
+) {
   let result = 0
 
   for (const [row] of field.entries()) {
     // For part 2 we already know a matching horizontal line
     // Avoid the known line to avoid falsified results
-    if (row === avoid) continue
+    if (row === skipRow) continue
 
     // Split fields in two slices
     const [above, below] = sliceHorizontal(field, row)
@@ -37,36 +46,24 @@ function hasHorizontalMirror(field: string[], avoid = 0) {
     const aNorm = a.substring(0, range)
     const bNorm = b.substring(0, range)
 
+    if (diffTolerance && strDiff(aNorm, bNorm) == 1) return row
     if (aNorm == bNorm) result = row
   }
 
   return result
 }
 
-function toggleChar(str: string, pos: number) {
-  const rep = str.charAt(pos) === "#" ? "." : "#"
-  return str.substring(0, pos) + rep + str.substring(pos + 1)
-}
-
 function hasMirror(field: string[], part2 = false): number {
   const v = hasHorizontalMirror(transpose(field))
   const h = hasHorizontalMirror(field)
-  const [ym, xm] = [field.length, field[0].length]
 
   if (part2) {
-    for (const y of _.range(0, ym)) {
-      for (const x of _.range(0, xm)) {
-        const otherField = _.cloneDeep(field)
-        otherField[y] = toggleChar(field[y], x)
+    const ov = hasHorizontalMirror(transpose(field), v, true)
+    const oh = hasHorizontalMirror(field, h, true)
 
-        const ov = hasHorizontalMirror(transpose(otherField), v)
-        const oh = hasHorizontalMirror(otherField, h)
-
-        if (ov > 0 || oh > 0) {
-          // We found another reflection
-          return ov + oh * 100
-        }
-      }
+    if (ov > 0 || oh > 0) {
+      // We found another reflection
+      return ov + oh * 100
     }
   }
 
