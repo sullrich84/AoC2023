@@ -22,20 +22,16 @@ function sliceHorizontal(field: string[], row: number) {
 
 function strDiff(a: string, b: string) {
   const zip = _.zip(a.split(""), b.split(""))
-  return _.sum(zip.map((e) => e[0] !== e[1] ? 1 : 0))
+  return _.sum(zip.map(([a, b]) => a != b ? 1 : 0))
 }
 
-function hasHorizontalMirror(
-  field: string[],
-  skipRow = 0,
-  diffTolerance = false,
-) {
+function hasHorizontalMirror(field: string[], skip = 0, unsmudge = false) {
   let result = 0
 
   for (const [row] of field.entries()) {
     // For part 2 we already know a matching horizontal line
     // Avoid the known line to avoid falsified results
-    if (row === skipRow) continue
+    if (row === skip) continue
 
     // Split fields in two slices
     const [above, below] = sliceHorizontal(field, row)
@@ -46,7 +42,7 @@ function hasHorizontalMirror(
     const aNorm = a.substring(0, range)
     const bNorm = b.substring(0, range)
 
-    if (diffTolerance && strDiff(aNorm, bNorm) == 1) return row
+    if (unsmudge && strDiff(aNorm, bNorm) == 1) return row
     if (aNorm == bNorm) result = row
   }
 
