@@ -28,11 +28,11 @@ function hasHorizontalMirror(field: string[], avoid = 0) {
     // Avoid the known line to avoid falsified results
     if (row === avoid) continue
 
-    // Split fields in two slices 
+    // Split fields in two slices
     const [above, below] = sliceHorizontal(field, row)
     const [a, b] = [above.join(""), below.join("")]
 
-    // Bring both rows to same length 
+    // Bring both rows to same length
     const range = Math.min(a.length, b.length)
     const aNorm = a.substring(0, range)
     const bNorm = b.substring(0, range)
@@ -48,30 +48,30 @@ function toggleChar(str: string, pos: number) {
   return str.substring(0, pos) + rep + str.substring(pos + 1)
 }
 
-function hasMirror(field: string[], findOther = false): number {
+function hasMirror(field: string[], part2 = false): number {
   const v = hasHorizontalMirror(transpose(field))
   const h = hasHorizontalMirror(field)
   const [ym, xm] = [field.length, field[0].length]
 
-  // Skip here for part 1
-  if (!findOther) return v + h * 100
+  if (part2) {
+    for (const y of _.range(0, ym)) {
+      for (const x of _.range(0, xm)) {
+        const otherField = _.cloneDeep(field)
+        otherField[y] = toggleChar(field[y], x)
 
-  for (const y of _.range(0, ym)) {
-    for (const x of _.range(0, xm)) {
-      const otherField = _.cloneDeep(field)
-      otherField[y] = toggleChar(field[y], x)
+        const ov = hasHorizontalMirror(transpose(otherField), v)
+        const oh = hasHorizontalMirror(otherField, h)
 
-      const ov = hasHorizontalMirror(transpose(otherField), v)
-      const oh = hasHorizontalMirror(otherField, h)
-
-      if (ov > 0 || oh > 0) {
-        // We found another reflection
-        return ov + oh * 100
+        if (ov > 0 || oh > 0) {
+          // We found another reflection
+          return ov + oh * 100
+        }
       }
     }
   }
 
-  throw "No other reflection found"
+  // Part 1:
+  return v + h * 100
 }
 
 /// Part 1
