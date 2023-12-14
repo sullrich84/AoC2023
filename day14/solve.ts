@@ -19,7 +19,7 @@ function getColumn(data: Puzzle, col: number): PuzzleLine {
   return data.map((row) => row[col])
 }
 
-function shiftRocks(line: PuzzleLine, reverse = true): string {
+function shiftRocks(line: PuzzleLine, reverse = true): PuzzleLine {
   const result = []
 
   for (const part of line.join("").split("#")) {
@@ -28,26 +28,20 @@ function shiftRocks(line: PuzzleLine, reverse = true): string {
     result.push(orderedString.join(""))
   }
 
-  return result.join("#")
+  return result.join("#").split("")
 }
 
-function transpose(line: PuzzleLine): PuzzleLine {
-  const transposed = _.unzip(line.map((row) => row.split("")))
-  return transposed.map((col) => col.join(""))
+function transpose(puzzle: Puzzle): Puzzle {
+  const transposed = _.unzip(puzzle.map((row) => row))
+  return transposed.map((col) => col)
 }
 
-function count(payload: string, target: string): number {
-  const split = payload.split("")
-  return _.countBy(split)[target] || 0
-}
-
-function countBalance(line: PuzzleLine): number {
+function countBalance(puzzle: Puzzle): number {
   let total = 0
 
-  for (let i = 0; i < line.length; i++) {
-    const row = line.length - i
-    const c = count(line[i], "O")
-    total += row * c
+  for (const [idx, line] of puzzle.entries()) {
+    const row = puzzle.length - idx
+    total += row * _.countBy(line)["O"] || 0
   }
 
   return total
@@ -56,7 +50,7 @@ function countBalance(line: PuzzleLine): number {
 /// Part 1
 
 const solve1 = (data: Puzzle) => {
-  const res = []
+  const res: Puzzle = []
   for (let i = 0; i < data.length; i++) {
     res.push(shiftRocks(getColumn(data, i)))
   }
@@ -74,7 +68,7 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 function shift(data: Puzzle, dir: string): Puzzle {
-  let res = []
+  let res: Puzzle = []
   const ns = dir == "n" || dir == "s"
 
   for (let i = 0; i < data.length; i++) {
@@ -83,7 +77,7 @@ function shift(data: Puzzle, dir: string): Puzzle {
   }
 
   if (ns) res = transpose(res)
-  return res.map((l) => l.split(""))
+  return res
 }
 
 function hash(puzzle: Puzzle) {
