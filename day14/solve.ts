@@ -32,8 +32,7 @@ function shiftRocks(line: PuzzleLine, reverse = true): PuzzleLine {
 }
 
 function transpose(puzzle: Puzzle): Puzzle {
-  const transposed = _.unzip(puzzle.map((row) => row))
-  return transposed.map((col) => col)
+  return _.unzip(puzzle.map((row) => row)).map((col) => col)
 }
 
 function countBalance(puzzle: Puzzle): number {
@@ -111,7 +110,7 @@ const solve2 = (data: Puzzle, cycles = 1_000_000_000) => {
 
   // Leap forward in the repating pattern
   const target = (cycles - offset) % (uniqueValues.length - offset) + offset - 1
-  return countBalance(uniqueValues[target].map((l) => l.join("")))
+  return countBalance(uniqueValues[target])
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
