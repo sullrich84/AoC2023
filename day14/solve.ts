@@ -7,9 +7,8 @@ import { read } from "../utils/Reader.ts"
 type Puzzle = string[][]
 
 const [task, sample] = read("day14").map((file) =>
-  _.initial(file.split("\n").map(line => line.split("")))
+  _.initial(file.split("\n").map((line) => line.split("")))
 )
-
 
 console.clear()
 console.log("🎄 Day 14: Parabolic Reflector Dish")
@@ -19,15 +18,18 @@ const runPart2 = false
 const runBoth = false
 
 function getColumn(data: string[][], x: number) {
-  return data.map(row => row[x])
+  return data.map((row) => row[x])
 }
 
-function shiftRocksLeft(line: string[]) {
+function shiftRocks(line: string[], left = true) {
   const result = []
+
   for (const part of line.join("").split("#")) {
-    const orderedString = part.split("").sort().reverse().join("")
-    result.push(orderedString)
+    const orderedString = part.split("").sort()
+    if (left) orderedString.reverse()
+    result.push(orderedString.join(""))
   }
+
   return result.join("#")
 }
 
@@ -41,26 +43,28 @@ function count(payload: string, target: string) {
   return _.countBy(split)[target] || 0
 }
 
+function countBalance(data: string[]) {
+  let total = 0
+
+  for (let i = 0; i < data.length; i++) {
+    const row = data.length - i
+    const c = count(data[i], "O")
+    total += row * c
+  }
+
+  return total
+}
+
 /// Part 1
 
 const solve1 = (data: Puzzle) => {
   let res = []
 
   for (let i = 0; i < data.length; i++) {
-    res.push(shiftRocksLeft(getColumn(data, i)))
+    res.push(shiftRocks(getColumn(data, i)))
   }
 
-  res = transpose(res)
-  let total = 0
-
-  for (let i = 0; i < data.length; i++) {
-    const row = data.length - i
-    const c = count(res[i], "O") 
-    console.log(row, "\t", res[i], "\t", c)
-    total += row * c
-  }
-
-  return total
+  return countBalance(transpose(res))
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
@@ -73,10 +77,10 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
-   let res = []
+  let res = []
 
   for (let i = 0; i < data.length; i++) {
-    res.push(shiftRocksLeft(getColumn(data, i)))
+    res.push(shiftRocks(getColumn(data, i)))
   }
 
   res = transpose(res)
@@ -84,13 +88,12 @@ const solve2 = (data: Puzzle) => {
 
   for (let i = 0; i < data.length; i++) {
     const row = data.length - i
-    const c = count(res[i], "O") 
+    const c = count(res[i], "O")
     console.log(row, "\t", res[i], "\t", c)
     total += row * c
   }
 
   return total
-
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
