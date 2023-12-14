@@ -1,11 +1,9 @@
 // @deno-types="npm:@types/lodash"
-import _, { join } from "npm:lodash"
-// import {data, sample, Puzzle } from "./data.ts"
-
+import _ from "npm:lodash"
 import { read } from "../utils/Reader.ts"
 
-type Puzzle = string[][]
-
+type Puzzle = PuzzleLine[]
+type PuzzleLine = string[]
 const [task, sample] = read("day14").map((file) =>
   _.initial(file.split("\n").map((line) => line.split("")))
 )
@@ -14,41 +12,41 @@ console.clear()
 console.log("🎄 Day 14: Parabolic Reflector Dish")
 
 const runPart1 = true
-const runPart2 = false
-const runBoth = false
+const runPart2 = true
+const runBoth = true
 
-function getColumn(data: string[][], x: number) {
-  return data.map((row) => row[x])
+function getColumn(data: Puzzle, col: number): PuzzleLine {
+  return data.map((row) => row[col])
 }
 
-function shiftRocks(line: string[], left = true) {
+function shiftRocks(line: PuzzleLine, reverse = true): string {
   const result = []
 
   for (const part of line.join("").split("#")) {
     const orderedString = part.split("").sort()
-    if (left) orderedString.reverse()
+    if (reverse) orderedString.reverse()
     result.push(orderedString.join(""))
   }
 
   return result.join("#")
 }
 
-function transpose(field: string[]) {
-  const transposed = _.unzip(field.map((row) => row.split("")))
+function transpose(line: PuzzleLine): PuzzleLine {
+  const transposed = _.unzip(line.map((row) => row.split("")))
   return transposed.map((col) => col.join(""))
 }
 
-function count(payload: string, target: string) {
+function count(payload: string, target: string): number {
   const split = payload.split("")
   return _.countBy(split)[target] || 0
 }
 
-function countBalance(data: string[]) {
+function countBalance(line: PuzzleLine): number {
   let total = 0
 
-  for (let i = 0; i < data.length; i++) {
-    const row = data.length - i
-    const c = count(data[i], "O")
+  for (let i = 0; i < line.length; i++) {
+    const row = line.length - i
+    const c = count(line[i], "O")
     total += row * c
   }
 
@@ -58,8 +56,7 @@ function countBalance(data: string[]) {
 /// Part 1
 
 const solve1 = (data: Puzzle) => {
-  let res = []
-
+  const res = []
   for (let i = 0; i < data.length; i++) {
     res.push(shiftRocks(getColumn(data, i)))
   }
@@ -76,24 +73,51 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-const solve2 = (data: Puzzle) => {
+function shift(data: Puzzle, dir: string): Puzzle {
   let res = []
+  const ns = dir == "n" || dir == "s"
 
   for (let i = 0; i < data.length; i++) {
-    res.push(shiftRocks(getColumn(data, i)))
+    const rocks = ns ? getColumn(data, i) : data[i]
+    res.push(shiftRocks(rocks, dir == "n" || dir == "w"))
   }
 
-  res = transpose(res)
-  let total = 0
+  if (ns) res = transpose(res)
+  return res.map((l) => l.split(""))
+}
 
-  for (let i = 0; i < data.length; i++) {
-    const row = data.length - i
-    const c = count(res[i], "O")
-    console.log(row, "\t", res[i], "\t", c)
-    total += row * c
+function hash(puzzle: Puzzle) {
+  return _.flatMap(puzzle).join("")
+}
+
+const solve2 = (data: Puzzle, cycles = 1_000_000_000) => {
+  const dirs = ["n", "w", "s", "e"]
+  const cache: { [key: string]: Puzzle } = {}
+
+  while (true) {
+    const h = hash(data)
+    if (cache[h] != undefined) {
+      // Found a repeating pattern
+      data = cache[h]
+      break
+    }
+
+    for (const dir of dirs) {
+      data = shift(data, dir)
+    }
+
+    cache[h] = data
   }
 
-  return total
+  const lastKey = hash(data)
+  const uniqueValues = _.values(cache)
+
+  // Cut of the uniqe states at the beginning where the stones "layed loosely in the middle"
+  const offset = uniqueValues.findIndex((e) => hash(e) == lastKey)
+
+  // Leap forward in the repating pattern
+  const target = (cycles - offset) % (uniqueValues.length - offset) + offset - 1
+  return countBalance(uniqueValues[target].map((l) => l.join("")))
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
