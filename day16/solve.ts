@@ -1,9 +1,6 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
-// import {data, sample, Puzzle } from "./data.ts"
-
 import { read } from "../utils/Reader.ts"
-import { i } from "npm:mathjs"
 
 type Puzzle = string[][]
 
@@ -14,9 +11,9 @@ const [task, sample] = read("day16").map((file) =>
 console.clear()
 console.log("🎄 Day 16: The Floor Will Be Lava")
 
-const runPart1 = true
-const runPart2 = false
-const runBoth = true
+const runPart1 = false
+const runPart2 = true
+const runBoth = false
 
 /// Part 1
 
@@ -29,12 +26,12 @@ const dir: { [key: Dirs]: [number, number] } = {
   "RIGHT": [0, 1],
 }
 
-const solve1 = (data: Puzzle, startMov: string) => {
+const solve1 = (data: Puzzle, startPos: [number, number], startMov: string) => {
   const seen = new Set()
   const energized = new Set()
 
   const [ym, xm] = [data.length, data[0].length]
-  let beams = [ { pos: [0, 0], mov: startMov }, ]
+  let beams = [{ pos: startPos, mov: startMov }]
 
   while (beams.length > 0) {
     const disabled = []
@@ -106,8 +103,10 @@ const solve1 = (data: Puzzle, startMov: string) => {
 
 // > 7410
 
-const solve1Sample = runPart1 ? solve1(sample, "RIGHT") : "skipped"
-const solve1Data = runPart1 && runBoth ? solve1(task, "DOWN") : "skipped"
+const solve1Sample = runPart1 ? solve1(sample, [0, 0], "RIGHT") : "skipped"
+const solve1Data = runPart1 && runBoth
+  ? solve1(task, [0, 0], "DOWN")
+  : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
@@ -116,6 +115,7 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
+  return solve1(data, [0, 0], "RIGHT")
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
