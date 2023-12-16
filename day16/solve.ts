@@ -11,9 +11,9 @@ const [task, sample] = read("day16").map((file) =>
 console.clear()
 console.log("🎄 Day 16: The Floor Will Be Lava")
 
-const runPart1 = false
+const runPart1 = true
 const runPart2 = true
-const runBoth = false
+const runBoth = true
 
 /// Part 1
 
@@ -40,7 +40,6 @@ const solve1 = (data: Puzzle, startPos: [number, number], startMov: string) => {
       const { pos, mov } = beam
       const [y, x] = pos
       const [dy, dx] = dir[mov]
-      console.log({ beam })
 
       // Disable beam if path already covered before
       const key = [y, x, mov].join(":")
@@ -94,7 +93,6 @@ const solve1 = (data: Puzzle, startPos: [number, number], startMov: string) => {
     }
 
     // Remove all disabled beams
-    console.log({ beams: beams.length, disabled: disabled.length })
     beams = _.without(beams, ...disabled)
   }
 
@@ -114,9 +112,79 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-const solve2 = (data: Puzzle) => {
-  return solve1(data, [0, 0], "RIGHT")
+function calcStart(data: Puzzle, pos: [number, number], mov: string) {
+  const [y, x] = pos
+  const tile = data[y][x]
+  const starts = []
+
+  if (tile == "|") {
+    if (mov == "RIGHT" || mov == "LEFT") {
+      starts.push({ pos, mov: "UP" })
+      starts.push({ pos, mov: "DOWN" })
+    } else {
+      starts.push({ pos, mov})
+    }
+  }
+
+  if (tile == "-") {
+    if (mov == "UP" || mov == "DOWN") {
+      starts.push({ pos, mov: "LEFT" })
+      starts.push({ pos, mov: "RIGHT" })
+    } else {
+      starts.push({ pos, mov })
+    }
+  }
+
+  if (tile == "/") {
+    if (mov == "UP") starts.push({ pos, mov: "RIGHT" })
+    if (mov == "DOWN") starts.push({ pos, mov: "LEFT" })
+    if (mov == "RIGHT") starts.push({ pos, mov: "UP" })
+    if (mov == "LEFT") starts.push({ pos, mov: "DOWN" })
+  }
+
+  if (tile == "\\") {
+    if (mov == "UP") starts.push({ pos, mov: "LEFT" })
+    if (mov == "DOWN") starts.push({ pos, mov: "RIGHT" })
+    if (mov == "RIGHT") starts.push({ pos, mov: "DOWN" })
+    if (mov == "LEFT") starts.push({ pos, mov: "UP" })
+  }
+
+  if (tile == ".") starts.push({ pos: [y, x], mov })
+
+  if (y == 0 && x == 0) {
+    console.log(starts)
+  }
+
+  return starts
 }
+
+const solve2 = (data: Puzzle) => {
+  const [ym, xm] = [data.length, data[0].length]
+
+  const upStarts = _.flatMap(
+    _.range(0, xm).map((x) => calcStart(data, [0, x], "DOWN")),
+  )
+  const downStarts = _.flatMap(
+    _.range(0, xm).map((x) => calcStart(data, [ym - 1, x], "UP")),
+  )
+
+  const rightStarts = _.flatMap(
+    _.range(0, ym).map((y) => calcStart(data, [y, 0], "LEFT")),
+  )
+
+  const leftStarts = _.flatMap(
+    _.range(0, ym).map((y) => calcStart(data, [y, xm - 1], "RIGHT")),
+  )
+
+  // console.log(upStarts)
+
+  const starts = [...upStarts, ...downStarts, ...leftStarts, ...rightStarts]
+  
+  const config = starts.map((e) => solve1(data, e.pos, e.mov))
+  return _.max(config)
+}
+
+// > 7753 > 7754
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
 const solve2Data = runPart2 && runBoth ? solve2(task) : "skipped"
