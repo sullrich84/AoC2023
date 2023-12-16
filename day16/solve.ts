@@ -45,7 +45,7 @@ const solve1 = (grid: Puzzle, pos: Coord = [0, -1], mov = "RIGHT") => {
       const [y, x] = pos
       const [dy, dx] = dir[mov]
 
-      // Disable beam if path already covered before
+      // Disable beam if path already covered previously
       const key = [y, x, mov].join(":")
       if (seen.has(key)) {
         disabled.push(beam)
