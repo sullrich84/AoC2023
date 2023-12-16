@@ -17,21 +17,25 @@ const runBoth = true
 
 /// Part 1
 
-const Dirs = "UP" | "DOWN" | "LEFT" | "RIGHT"
+type Coord = [number, number]
+type Directions = { UP: Coord; DOWN: Coord; LEFT: Coord; RIGHT: Coord }
+type Beams = { pos: Coord; mov: string }[]
 
-const dir: { [key: Dirs]: [number, number] } = {
-  "UP": [-1, 0],
-  "DOWN": [1, 0],
-  "LEFT": [0, -1],
-  "RIGHT": [0, 1],
+const dir: Directions = {
+  UP: [-1, 0],
+  DOWN: [1, 0],
+  LEFT: [0, -1],
+  RIGHT: [0, 1],
 }
 
-const solve1 = (data: Puzzle, startPos: [number, number], startMov: string) => {
+function insideGrid(grid: Puzzle, y: number, x: number) {
+  return _.inRange(y, 0, grid.length) && _.inRange(x, 0, grid[0].length)
+}
+
+const solve1 = (grid: Puzzle, pos: Coord = [0, -1], mov = "RIGHT") => {
   const seen = new Set()
   const energized = new Set()
-
-  const [ym, xm] = [data.length, data[0].length]
-  let beams = [{ pos: startPos, mov: startMov }]
+  let beams: Beams = [{ pos, mov }]
 
   while (beams.length > 0) {
     const disabled = []
@@ -46,21 +50,20 @@ const solve1 = (data: Puzzle, startPos: [number, number], startMov: string) => {
       if (seen.has(key)) {
         disabled.push(beam)
         continue
+      } else {
+        seen.add(key)
       }
 
-      // Memorize position
-      seen.add(key)
       energized.add([y, x].join(":"))
-
       const [ny, nx] = [y + dy, x + dx]
 
       // Disable beam if next pos is out of bounds
-      if (!(_.inRange(ny, 0, ym) && _.inRange(nx, 0, xm))) {
+      if (!insideGrid(grid, ny, nx)) {
         disabled.push(beam)
         continue
       }
 
-      const nTile = data[ny][nx]
+      const nTile = grid[ny][nx]
       let nMov = mov
 
       // Check reflection
@@ -96,15 +99,12 @@ const solve1 = (data: Puzzle, startPos: [number, number], startMov: string) => {
     beams = _.without(beams, ...disabled)
   }
 
-  return energized.size
+  // Since we started outside the grid, we subtract by 1
+  return energized.size - 1
 }
 
-// > 7410
-
-const solve1Sample = runPart1 ? solve1(sample, [0, 0], "RIGHT") : "skipped"
-const solve1Data = runPart1 && runBoth
-  ? solve1(task, [0, 0], "DOWN")
-  : "skipped"
+const solve1Sample = runPart1 ? solve1(sample) : "skipped"
+const solve1Data = runPart1 && runBoth ? solve1(task) : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
@@ -112,79 +112,14 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-function calcStart(data: Puzzle, pos: [number, number], mov: string) {
-  const [y, x] = pos
-  const tile = data[y][x]
-  const starts = []
-
-  if (tile == "|") {
-    if (mov == "RIGHT" || mov == "LEFT") {
-      starts.push({ pos, mov: "UP" })
-      starts.push({ pos, mov: "DOWN" })
-    } else {
-      starts.push({ pos, mov})
-    }
-  }
-
-  if (tile == "-") {
-    if (mov == "UP" || mov == "DOWN") {
-      starts.push({ pos, mov: "LEFT" })
-      starts.push({ pos, mov: "RIGHT" })
-    } else {
-      starts.push({ pos, mov })
-    }
-  }
-
-  if (tile == "/") {
-    if (mov == "UP") starts.push({ pos, mov: "RIGHT" })
-    if (mov == "DOWN") starts.push({ pos, mov: "LEFT" })
-    if (mov == "RIGHT") starts.push({ pos, mov: "UP" })
-    if (mov == "LEFT") starts.push({ pos, mov: "DOWN" })
-  }
-
-  if (tile == "\\") {
-    if (mov == "UP") starts.push({ pos, mov: "LEFT" })
-    if (mov == "DOWN") starts.push({ pos, mov: "RIGHT" })
-    if (mov == "RIGHT") starts.push({ pos, mov: "DOWN" })
-    if (mov == "LEFT") starts.push({ pos, mov: "UP" })
-  }
-
-  if (tile == ".") starts.push({ pos: [y, x], mov })
-
-  if (y == 0 && x == 0) {
-    console.log(starts)
-  }
-
-  return starts
+const solve2 = (grid: Puzzle) => {
+  const [ym, xm] = [grid.length, grid[0].length]
+  const up = _.range(0, xm).map((x) => solve1(grid, [-1, x], "DOWN"))
+  const down = _.range(0, xm).map((x) => solve1(grid, [ym, x], "UP"))
+  const left = _.range(0, ym).map((y) => solve1(grid, [y, -1], "RIGHT"))
+  const right = _.range(0, ym).map((y) => solve1(grid, [y, xm], "LEFT"))
+  return _.max(_.flatMap([up, down, left, right]))
 }
-
-const solve2 = (data: Puzzle) => {
-  const [ym, xm] = [data.length, data[0].length]
-
-  const upStarts = _.flatMap(
-    _.range(0, xm).map((x) => calcStart(data, [0, x], "DOWN")),
-  )
-  const downStarts = _.flatMap(
-    _.range(0, xm).map((x) => calcStart(data, [ym - 1, x], "UP")),
-  )
-
-  const rightStarts = _.flatMap(
-    _.range(0, ym).map((y) => calcStart(data, [y, 0], "LEFT")),
-  )
-
-  const leftStarts = _.flatMap(
-    _.range(0, ym).map((y) => calcStart(data, [y, xm - 1], "RIGHT")),
-  )
-
-  // console.log(upStarts)
-
-  const starts = [...upStarts, ...downStarts, ...leftStarts, ...rightStarts]
-  
-  const config = starts.map((e) => solve1(data, e.pos, e.mov))
-  return _.max(config)
-}
-
-// > 7753 > 7754
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
 const solve2Data = runPart2 && runBoth ? solve2(task) : "skipped"
