@@ -29,20 +29,16 @@ const solve1 = (data: Puzzle) => {
 
   for (const [y, row] of data.entries()) {
     for (const [x, tile] of row.entries()) {
-      if (tile == "S") start = [y, x]
-      else if (tile == "F") target = [y, x]
+      if (tile == "1") start = [y, x]
+      else if (tile == "4") target = [y, x]
     }
   }
 
   const directions = [
-    [-1, 0],  // Up
-    [0, -1],  // Left
-    [0, 1],   // Right
-    [1, 0],   // Down
-    [-1, -1], // Diagonal Up-Left
-    [-1, 1],  // Diagonal Up-Right
-    [1, -1],  // Diagonal Down-Left
-    [1, 1],   // Diagonal Down-Right
+    [-1, 0], // Up
+    [0, -1], // Left
+    [0, 1], // Right
+    [1, 0], // Down
   ]
 
   let minPath = []
@@ -50,7 +46,7 @@ const solve1 = (data: Puzzle) => {
   const queue: [Coord, Coord[]][] = [[start, []]]
 
   while (queue.length > 0) {
-    // NOTE: This ensures that the earliest element gets pulled, so whenever 
+    // NOTE: This ensures that the earliest element gets pulled, so whenever
     // the target is reached, we know it is the shortest possible way.
     const [pos, path] = queue.shift()
     const [y, x] = pos
