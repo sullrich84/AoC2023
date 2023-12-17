@@ -21,104 +21,70 @@ const runBoth = false
 
 /// Part 1
 
-function insideGrid(data: Puzzle, pos: Coord) {
-  return _.inRange(pos[0], 0, data.length) &&
-    _.inRange(pos[1], 0, data[0].length)
-}
+const solve1 = (grid: Puzzle) => {
+  const [ym, xm] = [grid.length, grid[0].length]
+  const target = [ym - 1, xm - 1]
 
-const solve1 = (data: Puzzle) => {
-  const [ym, xm] = [data.length, data[0].length]
-
-  // Find startnode
-  const start: Coord = [0, 0]
-  const target: Coord = [ym - 1, xm - 1]
-
-  let minPath = []
-  let minHeatLoss = Number.POSITIVE_INFINITY
-  const seen = new Set()
+  function insideGrid(y: number, x: number) {
+    return _.inRange(y, 0, grid.length) && _.inRange(x, 0, grid[0].length)
+  }
 
   const directions = [
-    [0, 1], 
-    [1, 0],
-    [0, -1],
-    [-1, 0],
+    [1, 0], // Up
+    [-1, 0], // Down
+    [0, -1], // Left
+    [0, 1], // Right
   ]
 
-  type Queue = {
-    hl: number
-    pos: Coord
-    dir: Coord
-    cs: number
-    path: Coord[]
-  }[]
-  let queue: Queue = [{
-    hl: 0,
-    pos: start,
-    dir: [0, 0],
-    cs: 0,
-    path: [],
-  }]
+  let queue = [[0, [0, 0], [0, 0], 0]]
+  const seen = new Set()
 
-  while (queue.length > 0) {
-    const { hl, pos, dir, cs, path } = queue.shift()
+  while (queue.length) {
+    queue = _.sortBy(queue, (e) => e[0])
+    const [heatMap, pos, delta, consecutiveSteps] = queue.shift()
     const [y, x] = pos
-    const [dy, dx] = dir
+    const [dy, dx] = delta
 
-    // Skip out of grid
-    if (!insideGrid(data, pos)) continue
-
-    // Skip if target reached
-    if (_.isEqual(pos, target)) {
-      minPath = path
-      minHeatLoss = hl
-      break
+    if (_.isEqual([y, x], target)) {
+      return heatMap
     }
 
-    // Skip already visited from same previous path
-    const key = [y, x, dy, dx, cs].join(":")
+    const key = _.flatMap([pos, delta, consecutiveSteps]).join(":")
     if (seen.has(key)) continue
     seen.add(key)
 
-    if (cs < 3 && dy != 0 && dx != 0) {
-      // Go into same direction
-      const npos = [y + dy, x + dx]
-      const [ny, nx] = npos
+    // Follow current direction for 3 steps in a row
+    if (consecutiveSteps < 3 || (dy != 0 && dx != 0)) {
+      const ny = y + dy
+      const nx = x + dx
 
-      if (insideGrid(data, npos)) {
-        const nhl = hl + data[ny][nx]
-        const ncs = cs + 1
-        const nPath = [...path, pos]
-        queue.push({ hl: nhl, pos: npos, dir, cs: ncs, path: nPath })
+      if (insideGrid(ny, nx)) {
+        const nHeatMap = heatMap + grid[ny][nx]
+        const nPos = [ny, nx]
+        queue.push([nHeatMap, nPos, delta, consecutiveSteps + 1])
       }
     }
 
     for (const [ndy, ndx] of directions) {
-      // Skip moving into same direction
-      if (ndy == dy && ndx == dx) continue
+      const nDelta = [ndy, ndx]
+
+      // Skip going same direction
+      if (_.isEqual(nDelta, delta)) continue
+
       // Skip going back
-      if (ndy == -dy && ndx == -dx) continue
+      if (_.isEqual(nDelta, [-dy, -dx])) continue
 
-      const npos = [y + ndy, x + ndx]
-      if (!insideGrid(data, npos)) continue
-      const [ny, nx] = npos
+      const [ny, nx] = [y + ndy, x + ndx]
 
-      const nhl = hl + data[ny][nx]
-      const ndir = [ndy, ndx]
-      const nPath = [...path, pos]
-      queue.push({ hl: nhl, pos: npos, dir: ndir, cs: 1, path: nPath })
+      // Skip steps outside
+      if (!insideGrid(ny, nx)) continue
+      const nHeatMap = heatMap + grid[ny][nx]
+      const nPos = [ny, nx]
+      queue.push([nHeatMap, nPos, nDelta, 1])
     }
-
-    queue = _.sortBy(queue, "hl")
-    // console.log(queue.map(e => JSON.stringify(e)))
-    // wait()
   }
 
-  minPath.forEach(([y, x]) => {
-    data[y][x] = "•"
-  })
-
-  data.forEach((row) => console.log(row.join("").replaceAll(".", " ")))
-  return [minPath.length, minHeatLoss]
+  return 0
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
