@@ -16,12 +16,16 @@ console.clear()
 console.log("🎄 Day 17: Clumsy Crucible")
 
 const runPart1 = true
-const runPart2 = false
+const runPart2 = true
 const runBoth = false
 
 /// Part 1
 
-const solve1 = (grid: Puzzle) => {
+const solve = (
+  grid: Puzzle,
+  minConsecutiveSteps = 0,
+  maxConsecutiveSteps = 3,
+) => {
   const [ym, xm] = [grid.length, grid[0].length]
   const target = [ym - 1, xm - 1]
 
@@ -45,7 +49,7 @@ const solve1 = (grid: Puzzle) => {
     const [y, x] = pos
     const [dy, dx] = delta
 
-    if (_.isEqual([y, x], target)) {
+    if (_.isEqual([y, x], target) && consecutiveSteps >= minConsecutiveSteps) {
       return heatMap
     }
 
@@ -54,7 +58,7 @@ const solve1 = (grid: Puzzle) => {
     seen.add(key)
 
     // Follow current direction for 3 steps in a row
-    if (consecutiveSteps < 3 || (dy != 0 && dx != 0)) {
+    if (consecutiveSteps < maxConsecutiveSteps || (dy != 0 && dx != 0)) {
       const ny = y + dy
       const nx = x + dx
 
@@ -65,30 +69,32 @@ const solve1 = (grid: Puzzle) => {
       }
     }
 
-    for (const [ndy, ndx] of directions) {
-      const nDelta = [ndy, ndx]
+    if (consecutiveSteps >= minConsecutiveSteps || (dy == 0 && dx == 0)) {
+      for (const [ndy, ndx] of directions) {
+        const nDelta = [ndy, ndx]
 
-      // Skip going same direction
-      if (_.isEqual(nDelta, delta)) continue
+        // Skip going same direction
+        if (_.isEqual(nDelta, delta)) continue
 
-      // Skip going back
-      if (_.isEqual(nDelta, [-dy, -dx])) continue
+        // Skip going back
+        if (_.isEqual(nDelta, [-dy, -dx])) continue
 
-      const [ny, nx] = [y + ndy, x + ndx]
+        const [ny, nx] = [y + ndy, x + ndx]
 
-      // Skip steps outside
-      if (!insideGrid(ny, nx)) continue
-      const nHeatMap = heatMap + grid[ny][nx]
-      const nPos = [ny, nx]
-      queue.push([nHeatMap, nPos, nDelta, 1])
+        // Skip steps outside
+        if (!insideGrid(ny, nx)) continue
+        const nHeatMap = heatMap + grid[ny][nx]
+        const nPos = [ny, nx]
+        queue.push([nHeatMap, nPos, nDelta, 1])
+      }
     }
   }
 
   return 0
 }
 
-const solve1Sample = runPart1 ? solve1(sample) : "skipped"
-const solve1Data = runPart1 && runBoth ? solve1(task) : "skipped"
+const solve1Sample = runPart1 ? solve(sample) : "skipped"
+const solve1Data = runPart1 && runBoth ? solve(task) : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
@@ -99,8 +105,8 @@ console.log("Task:\t", solve1Data)
 const solve2 = (data: Puzzle) => {
 }
 
-const solve2Sample = runPart2 ? solve2(sample) : "skipped"
-const solve2Data = runPart2 && runBoth ? solve2(task) : "skipped"
+const solve2Sample = runPart2 ? solve(sample, 4, 10) : "skipped"
+const solve2Data = runPart2 && runBoth ? solve(task, 4, 10) : "skipped"
 
 console.log("\nPart 2:")
 console.log("Sample:\t", solve2Sample)
