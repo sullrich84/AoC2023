@@ -6,6 +6,7 @@ import { wait } from "../utils/utils.ts"
 type Puzzle = number[][]
 type Coord = [number, number]
 
+
 const [task, sample] = read("day17").map((file) =>
   _.initial(
     file.split("\n").map((line) => line.split("").map((e) => parseInt(e))),
@@ -17,14 +18,16 @@ console.log("🎄 Day 17: Clumsy Crucible")
 
 const runPart1 = true
 const runPart2 = true
-const runBoth = false
+const runBoth = true
 
 /// Part 1
+console.time("p1")
 
 const solve = (
   grid: Puzzle,
   minConsecutiveSteps = 0,
   maxConsecutiveSteps = 3,
+  windowSize = 1,
 ) => {
   const [ym, xm] = [grid.length, grid[0].length]
   const target = [ym - 1, xm - 1]
@@ -34,10 +37,10 @@ const solve = (
   }
 
   const directions = [
-    [1, 0], // Up
     [-1, 0], // Down
-    [0, -1], // Left
     [0, 1], // Right
+    [1, 0], // Up
+    [0, -1], // Left
   ]
 
   let queue = [[0, [0, 0], [0, 0], 0]]
@@ -93,15 +96,16 @@ const solve = (
   return 0
 }
 
-const solve1Sample = runPart1 ? solve(sample) : "skipped"
-const solve1Data = runPart1 && runBoth ? solve(task) : "skipped"
+const solve1Sample = runPart1 ? solve(sample, 0, 3) : "skipped"
+const solve1Data = runPart1 && runBoth ? solve(task, 0, 3) : "skipped"
 
 console.log("\nPart 1:")
 console.log("Sample:\t", solve1Sample)
 console.log("Task:\t", solve1Data)
+console.timeEnd("p1")
 
 /// Part 2
-
+console.time("p2")
 const solve2 = (data: Puzzle) => {
 }
 
@@ -111,4 +115,5 @@ const solve2Data = runPart2 && runBoth ? solve(task, 4, 10) : "skipped"
 console.log("\nPart 2:")
 console.log("Sample:\t", solve2Sample)
 console.log("Task:\t", solve2Data)
+console.timeEnd("p2")
 console.log()
