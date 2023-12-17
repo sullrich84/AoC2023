@@ -1,5 +1,5 @@
 // @deno-types="npm:@types/lodash"
-import _, { sortBy } from "npm:lodash"
+import _, { functions, sortBy } from "npm:lodash"
 import { read } from "../utils/Reader.ts"
 import { wait } from "../utils/utils.ts"
 
@@ -21,6 +21,11 @@ const runBoth = false
 
 /// Part 1
 
+function insideGrid(data: Puzzle, pos: Coord) {
+  return _.inRange(pos[0], 0, data.length) &&
+    _.inRange(pos[1], 0, data[0].length)
+}
+
 const solve1 = (data: Puzzle) => {
   const [ym, xm] = [data.length, data[0].length]
 
@@ -29,73 +34,83 @@ const solve1 = (data: Puzzle) => {
   const target: Coord = [ym - 1, xm - 1]
 
   let minPath = []
-  let minHeatLoss = 0
+  let minHeatLoss = Number.POSITIVE_INFINITY
   const seen = new Set()
 
-  const directions = {
-    U: [-1, 0], // Up
-    L: [0, -1], // Left
-    R: [0, 1], // Right
-    D: [1, 0], // Down
-  }
+  const directions = [
+    [0, 1], 
+    [1, 0],
+    [0, -1],
+    [-1, 0],
+  ]
 
   type Queue = {
+    hl: number
     pos: Coord
-    heatLoss: number
-    lastMoves: Coord[]
-    lastDirs: string[]
+    dir: Coord
+    cs: number
+    path: Coord[]
   }[]
   let queue: Queue = [{
+    hl: 0,
     pos: start,
-    heatLoss: 0,
-    lastMoves: [],
-    lastDirs: [],
+    dir: [0, 0],
+    cs: 0,
+    path: [],
   }]
 
   while (queue.length > 0) {
-    const { pos, heatLoss, lastMoves, lastDirs } = queue.shift()
+    const { hl, pos, dir, cs, path } = queue.shift()
     const [y, x] = pos
+    const [dy, dx] = dir
 
-    // Check if target is reached
+    // Skip out of grid
+    if (!insideGrid(data, pos)) continue
+
+    // Skip if target reached
     if (_.isEqual(pos, target)) {
-      minPath = lastMoves
-      minHeatLoss = heatLoss
-      console.log(`Found path with ${minPath.length} steps`, queue.length)
+      minPath = path
+      minHeatLoss = hl
       break
     }
 
-    for (const nDir in directions) {
-      // Prevent going back the field we came from
-      const lastDir = _.slice(lastDirs, -1)[0]
-      if (
-        (lastDir == "D" && nDir == "U") || (lastDir == "U" && nDir == "D") ||
-        (lastDir == "L" && nDir == "R") || (lastDir == "R" && nDir == "L")
-      ) continue
+    // Skip already visited from same previous path
+    const key = [y, x, dy, dx, cs].join(":")
+    if (seen.has(key)) continue
+    seen.add(key)
 
-      // Prevent 3 steps into the same direction in a row
-      const lastThreeDirs = _.slice(lastDirs, -3)
-      const nDirCount = _.countBy(lastThreeDirs)[nDir] || 0
-      if (nDirCount >= 3) continue
+    if (cs < 3 && dy != 0 && dx != 0) {
+      // Go into same direction
+      const npos = [y + dy, x + dx]
+      const [ny, nx] = npos
 
-      const [dy, dx] = directions[nDir]
-      const [ny, nx] = [y + dy, x + dx]
-      if (!_.inRange(ny, 0, ym) || !_.inRange(nx, 0, xm)) continue
-      
-      const nKey = [y, x, nDir, nDirCount].join(":")
-      if (seen.has(nKey)) continue
-      seen.add(nKey)
-
-      const nPos: Coord = [ny, nx]
-      queue.push({
-        pos: nPos,
-        heatLoss: heatLoss + data[ny][nx],
-        lastMoves: [...lastMoves, nPos],
-        lastDirs: [...lastDirs, nDir],
-      })
+      if (insideGrid(data, npos)) {
+        const nhl = hl + data[ny][nx]
+        const ncs = cs + 1
+        const nPath = [...path, pos]
+        queue.push({ hl: nhl, pos: npos, dir, cs: ncs, path: nPath })
+      }
     }
 
-    queue = _.sortBy(queue, "heatLoss")
-    // console.log("pq", queue.map(e => e.heatLoss))
+    for (const [ndy, ndx] of directions) {
+      // Skip moving into same direction
+      if (ndy == dy && ndx == dx) continue
+      // Skip going back
+      if (ndy == -dy && ndx == -dx) continue
+
+      const npos = [y + ndy, x + ndx]
+      if (!insideGrid(data, npos)) continue
+      const [ny, nx] = npos
+
+      const nhl = hl + data[ny][nx]
+      const ndir = [ndy, ndx]
+      const nPath = [...path, pos]
+      queue.push({ hl: nhl, pos: npos, dir: ndir, cs: 1, path: nPath })
+    }
+
+    queue = _.sortBy(queue, "hl")
+    // console.log(queue.map(e => JSON.stringify(e)))
+    // wait()
   }
 
   minPath.forEach(([y, x]) => {
