@@ -1,11 +1,8 @@
 // @deno-types="npm:@types/lodash"
-import _, { functions, sortBy } from "npm:lodash"
+import _ from "npm:lodash"
 import { read } from "../utils/Reader.ts"
-import { wait } from "../utils/utils.ts"
 
 type Puzzle = number[][]
-type Coord = [number, number]
-
 
 const [task, sample] = read("day17").map((file) =>
   _.initial(
@@ -16,9 +13,9 @@ const [task, sample] = read("day17").map((file) =>
 console.clear()
 console.log("🎄 Day 17: Clumsy Crucible")
 
-const runPart1 = true
+const runPart1 = false
 const runPart2 = true
-const runBoth = true
+const runBoth = false
 
 /// Part 1
 console.time("p1")
@@ -27,9 +24,10 @@ const solve = (
   grid: Puzzle,
   minConsecutiveSteps = 0,
   maxConsecutiveSteps = 3,
-  windowSize = 1,
 ) => {
   const [ym, xm] = [grid.length, grid[0].length]
+
+  const start = [0, 0]
   const target = [ym - 1, xm - 1]
 
   function insideGrid(y: number, x: number) {
@@ -43,11 +41,11 @@ const solve = (
     [0, -1], // Left
   ]
 
-  let queue = [[0, [0, 0], [0, 0], 0]]
+  const queue = [[0, start, [0, 0], 0]]
   const seen = new Set()
 
   while (queue.length) {
-    queue = _.sortBy(queue, (e) => e[0])
+    queue.sort(([ahl], [bhl]) => ahl - bhl)
     const [heatMap, pos, delta, consecutiveSteps] = queue.shift()
     const [y, x] = pos
     const [dy, dx] = delta
