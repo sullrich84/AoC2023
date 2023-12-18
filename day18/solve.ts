@@ -37,13 +37,13 @@ const solve1 = (data: Puzzle) => {
 
   let gaussArea = 0
   for (let i = 0; i < points.length; i++) {
-    const prev = (i == 0) ? points[points.length - 1] : points[i - 1]
-    const next = (i == points.length - 1) ? points[0] : points[i + 1]
+    const prev = points[i - 1] || points[points.length - 1]
+    const next = points[i + 1] || points[0]
     const cur = points[i]
     gaussArea += (cur[0] * (prev[1] - next[1])) / 2
   }
 
-  return (gaussArea - borderLength / 2 + 1) + borderLength
+  return (Math.abs(gaussArea) - borderLength / 2) + borderLength + 1 
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
