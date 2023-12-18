@@ -42,7 +42,7 @@ const solve1 = (data: Puzzle) => {
 
   let gaussArea = 0
   for (let i = 0; i < points.length; i++) {
-    // Do the "shoelace" like calculation 
+    // Do the "shoelace" like calculation
     const prev = _.defaults(points[i - 1], _.last(points))
     const next = _.defaults(points[i + 1], _.first(points))
     const cur = points[i]
@@ -53,7 +53,7 @@ const solve1 = (data: Puzzle) => {
 
   // Since the Gauß area centers each point in the middle, we have to
   // subtract the outer half "offset" of the the outline border and
-  // add the "offset" for the corners. 
+  // add the "offset" for the corners.
   gaussArea -= borderLength / 2
   gaussArea += 1
 
