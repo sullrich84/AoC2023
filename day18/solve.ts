@@ -3,7 +3,7 @@ import _ from "npm:lodash"
 import { read } from "../utils/Reader.ts"
 import * as c from "https://deno.land/std@0.209.0/fmt/colors.ts"
 
-type Puzzle = string[][]
+type Puzzle = [string, number, string][]
 type Coords = [number, number]
 
 const [task, sample] = read("day18").map((file) =>
@@ -18,82 +18,32 @@ console.clear()
 console.log("🎄 Day 18: Lavaduct Lagoon")
 
 const runPart1 = true
-const runPart2 = false
+const runPart2 = true
 const runBoth = true
 
 /// Part 1
 
-function drawGrid(lines: [number, number][]) {
-  let count = 0
-
-  const [minY, maxY] = [
-    _.min(lines.map(([y]) => y)),
-    _.max(lines.map(([y]) => y)),
-  ]
-
-  const [minX, maxX] = [
-    _.min(lines.map(([_, x]) => x)),
-    _.max(lines.map(([_, x]) => x)),
-  ]
-
-  for (const y of _.range(minY, maxY + 1)) {
-    let line = ""
-    let prevWasLine = false
-    let inside = false
-
-    for (const x of _.range(minX, maxX + 1)) {
-      const isLine = _.some(lines, (line) => _.isEqual(line, [y, x]))
-      line += isLine ? c.cyan("#") : c.gray(".")
-    }
-
-    console.log(line)
-  }
-
-  return count
-}
-
 const solve1 = (data: Puzzle) => {
+  let borderLength = 0
   const points: Array<Coords> = [[0, 0]]
-  const lines: Array<Array<Coords>> = []
+  const dirs = { U: [-1, 0], D: [1, 0], L: [0, -1], R: [0, 1] }
 
   for (const [dir, steps] of data) {
-    const lastPoint = points[points.length - 1]
-    const nextPoint = [...lastPoint]
-
-    switch (dir) {
-      case "U":
-        nextPoint[0] = nextPoint[0] - steps
-        break
-      case "D":
-        nextPoint[0] = nextPoint[0] + steps
-        break
-      case "L":
-        nextPoint[1] = nextPoint[1] - steps
-        break
-      case "R":
-        nextPoint[1] = nextPoint[1] + steps
-        break
-    }
-
-    if (lastPoint[0] != nextPoint[0]) {
-      const yr = _.range(
-        Math.min(lastPoint[0], nextPoint[0]),
-        Math.max(lastPoint[0], nextPoint[0]) + 1,
-      )
-      lines.push([...yr.map((y) => [y, lastPoint[1]])])
-    } else {
-      const xr = _.range(
-        Math.min(lastPoint[1], nextPoint[1]),
-        Math.max(lastPoint[1], nextPoint[1]) + 1,
-      )
-      lines.push([...xr.map((x) => [lastPoint[0], x])])
-    }
-
-    points.push(nextPoint)
+    const [y, x]: Coords = points[points.length - 1]
+    const [dy, dx]: Coords = dirs[dir!]
+    borderLength += steps!
+    points.push([y + dy * steps!, x + dx * steps!])
   }
 
-  // console.log(lines)
-  return drawGrid(_.flatMap(lines))
+  let gaussArea = 0
+  for (let i = 0; i < points.length; i++) {
+    const prev = (i == 0) ? points[points.length - 1] : points[i - 1]
+    const next = (i == points.length - 1) ? points[0] : points[i + 1]
+    const cur = points[i]
+    gaussArea += (cur[0] * (prev[1] - next[1])) / 2
+  }
+
+  return (gaussArea - borderLength / 2 + 1) + borderLength
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
@@ -106,6 +56,16 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = (data: Puzzle) => {
+  const dirs = ["R", "D", "L", "U"]
+  const dataPart2: Puzzle = []
+
+  for (const [_a, _b, color] of data) {
+    const steps = parseInt(color.substring(1, 6), 16)
+    const dir = dirs[parseInt(color.substring(6))]
+    dataPart2.push([dir, steps, color])
+  }
+
+  return solve1(dataPart2)
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
