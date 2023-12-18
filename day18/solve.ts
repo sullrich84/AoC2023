@@ -35,9 +35,9 @@ const solve1 = (data: Puzzle) => {
 
   for (const [dir, steps] of data) {
     const [y, x]: Coords = points[points.length - 1]
-    const [dy, dx]: Coords = dirs[dir!]
-    borderLength += steps!
-    points.push([y + dy * steps!, x + dx * steps!])
+    const [dy, dx]: Coords = dirs[dir]
+    borderLength += steps
+    points.push([y + dy * steps, x + dx * steps])
   }
 
   let gaussArea = 0
