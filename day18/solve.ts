@@ -1,9 +1,9 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { read } from "../utils/Reader.ts"
-import * as c from "https://deno.land/std@0.209.0/fmt/colors.ts"
 
-type Puzzle = [string, number, string][]
+type Direction = "U" | "D" | "L" | "R"
+type Puzzle = [Direction, number, string][]
 type Coords = [number, number]
 
 const [task, sample] = read("day18").map((file) =>
@@ -26,7 +26,12 @@ const runBoth = true
 const solve1 = (data: Puzzle) => {
   let borderLength = 0
   const points: Array<Coords> = [[0, 0]]
-  const dirs = { U: [-1, 0], D: [1, 0], L: [0, -1], R: [0, 1] }
+  const dirs: { U: Coords; D: Coords; L: Coords; R: Coords } = {
+    U: [-1, 0],
+    D: [1, 0],
+    L: [0, -1],
+    R: [0, 1],
+  }
 
   for (const [dir, steps] of data) {
     const [y, x]: Coords = points[points.length - 1]
@@ -37,13 +42,22 @@ const solve1 = (data: Puzzle) => {
 
   let gaussArea = 0
   for (let i = 0; i < points.length; i++) {
-    const prev = points[i - 1] || points[points.length - 1]
-    const next = points[i + 1] || points[0]
+    // Do the "shoelace" like calculation 
+    const prev = _.defaults(points[i - 1], _.last(points))
+    const next = _.defaults(points[i + 1], _.first(points))
     const cur = points[i]
     gaussArea += (cur[0] * (prev[1] - next[1])) / 2
   }
 
-  return (Math.abs(gaussArea) - borderLength / 2) + borderLength + 1 
+  gaussArea = Math.abs(gaussArea)
+
+  // Since the Gauß area centers each point in the middle, we have to
+  // subtract the outer half "offset" of the the outline border and
+  // add the "offset" for the corners. 
+  gaussArea -= borderLength / 2
+  gaussArea += 1
+
+  return gaussArea + borderLength
 }
 
 const solve1Sample = runPart1 ? solve1(sample) : "skipped"
