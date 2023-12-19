@@ -1,6 +1,5 @@
 // @deno-types="npm:@types/lodash"
-import _, {} from "npm:lodash"
-
+import _, { range } from "npm:lodash"
 import { read } from "../utils/Reader.ts"
 
 type Puzzle = string[][]
@@ -44,9 +43,9 @@ const [task, sample] = read("day19").map((file) => {
 console.clear()
 console.log("🎄 Day 19: Aplenty")
 
-const runPart1 = true
-const runPart2 = false
-const runBoth = true
+const runPart1 = false
+const runPart2 = true
+const runBoth = false
 
 /// Part 1
 
@@ -86,7 +85,55 @@ console.log("Task:\t", solve1Data)
 /// Part 2
 
 const solve2 = ([workflows]: Puzzle) => {
-  console.log(workflows)
+  function count(ranges, name = "in") {
+    console.log(ranges)
+    if (name == "R") return 0
+    if (name == "A") {
+      let product = 1
+      for (const [low, high] of _.values(ranges)) {
+        product *= high - low + 1
+      }
+      return product
+    }
+
+    let total = 0
+    let useFallback = false
+
+    const { rules, fallback } = workflows[name]
+
+    for (const [key, cmp, n, target] of rules) {
+      const [low, high] = ranges[key]
+      const trueHalf = cmp == "<" ? [low, n - 1] : [n + 1, high]
+      const falseHalf = cmp == "<" ? [n, high] : [low, n]
+
+      if (trueHalf[0] <= trueHalf[1]) {
+        const copy = _.cloneDeep(ranges)
+        copy[key] = trueHalf
+        total += count(copy, target)
+      }
+
+      if (falseHalf[0] <= falseHalf[1]) {
+        ranges = _.cloneDeep(ranges)
+        ranges[key] = falseHalf
+      } else {
+        useFallback = true
+        break
+      }
+    }
+
+    if (useFallback) {
+      total += count(ranges, fallback)
+    }
+
+    return total
+  }
+
+  return count({
+    "x": [1, 4000],
+    "m": [1, 4000],
+    "a": [1, 4000],
+    "s": [1, 4000],
+  })
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
