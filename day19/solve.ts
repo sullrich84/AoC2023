@@ -43,7 +43,7 @@ const [task, sample] = read("day19").map((file) => {
 console.clear()
 console.log("🎄 Day 19: Aplenty")
 
-const runPart1 = false
+const runPart1 = true
 const runPart2 = true
 const runBoth = true
 
