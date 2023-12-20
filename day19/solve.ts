@@ -45,7 +45,7 @@ console.log("🎄 Day 19: Aplenty")
 
 const runPart1 = false
 const runPart2 = true
-const runBoth = false
+const runBoth = true
 
 /// Part 1
 
@@ -86,25 +86,30 @@ console.log("Task:\t", solve1Data)
 
 const solve2 = ([workflows]: Puzzle) => {
   function count(ranges, name = "in") {
-    console.log(ranges)
     if (name == "R") return 0
+
     if (name == "A") {
-      let product = 1
-      for (const [low, high] of _.values(ranges)) {
-        product *= high - low + 1
-      }
-      return product
+      return _.values(ranges).reduce(
+        (p, [low, high]) => p * (high - low + 1),
+        1,
+      )
     }
 
-    let total = 0
-    let useFallback = false
-
     const { rules, fallback } = workflows[name]
+    let total = 0
 
     for (const [key, cmp, n, target] of rules) {
       const [low, high] = ranges[key]
-      const trueHalf = cmp == "<" ? [low, n - 1] : [n + 1, high]
-      const falseHalf = cmp == "<" ? [n, high] : [low, n]
+      let trueHalf: [number, number]
+      let falseHalf: [number, number]
+
+      if (cmp == "<") {
+        trueHalf = [low, Math.min(n - 1, high)]
+        falseHalf = [Math.max(n, low), high]
+      } else {
+        trueHalf = [Math.max(n + 1, low), high]
+        falseHalf = [low, Math.min(n, high)]
+      }
 
       if (trueHalf[0] <= trueHalf[1]) {
         const copy = _.cloneDeep(ranges)
@@ -112,19 +117,11 @@ const solve2 = ([workflows]: Puzzle) => {
         total += count(copy, target)
       }
 
-      if (falseHalf[0] <= falseHalf[1]) {
-        ranges = _.cloneDeep(ranges)
-        ranges[key] = falseHalf
-      } else {
-        useFallback = true
-        break
-      }
+      if (falseHalf[0] > falseHalf[1]) break
+      ranges[key] = falseHalf
     }
 
-    if (useFallback) {
-      total += count(ranges, fallback)
-    }
-
+    total += count(ranges, fallback)
     return total
   }
 
