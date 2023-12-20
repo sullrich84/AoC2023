@@ -89,10 +89,8 @@ const solve2 = ([workflows]: Puzzle) => {
     if (name == "R") return 0
 
     if (name == "A") {
-      return _.values(ranges).reduce(
-        (p, [low, high]) => p * (high - low + 1),
-        1,
-      )
+      return _.values(ranges)
+        .reduce((p, [low, high]) => p * (high - low + 1), 1)
     }
 
     const { rules, fallback } = workflows[name]
