@@ -198,9 +198,9 @@ const solve2 = (data: Puzzle) => {
       if (pulse == 1 && dest == rxEmitter) {
         if (result[caller] != undefined) throw "handle overwrite"
         result[caller] = presses
-      
+
         if (_.values(result).length == targets.length) {
-          return _.values(result).reduce((p,c) => lcm(p, c), 1)
+          return _.values(result).reduce((p, c) => lcm(p, c), 1)
         }
       }
 
