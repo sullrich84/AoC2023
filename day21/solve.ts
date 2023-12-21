@@ -1,9 +1,6 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
-// import {data, sample, Puzzle } from "./data.ts"
-
 import { read } from "../utils/Reader.ts"
-import { wait } from "../utils/utils.ts"
 
 type Puzzle = string[][]
 
@@ -15,7 +12,7 @@ console.clear()
 console.log("🎄 Day 21: Step Counter")
 
 const runPart1 = true
-const runPart2 = false
+const runPart2 = true
 const runBoth = true
 
 /// Part 1
@@ -27,34 +24,10 @@ const dirs = [
   [0, -1],
 ]
 
-function draw(grid, seen) {
-  const [ym, xm] = [grid.length, grid[0].length]
-  console.log()
+function bfs(grid: Puzzle, sy: number, sx: number, remainingSteps: number) {
+  const [yLen, xLen] = [grid.length, grid[0].length]
 
-  for (let y = 0; y < ym; y++) {
-    let row = ""
-    for (let x = 0; x < xm; x++) {
-      const tile = grid[y][x]
-      const key = [y, x].join(":")
-      row += seen.has(key) ? "O" : tile
-    }
-    console.log(row)
-  }
-
-  wait()
-}
-
-const solve1 = (grid: Puzzle, maxSteps: number) => {
-  const [ym, xm] = [grid.length, grid[0].length]
-
-  let [sy, sx] = [0, 0]
-  for (let y = 0; y < ym; y++) {
-    for (let x = 0; x < xm; x++) {
-      if (grid[y][x] == "S") [sy, sx] = [y, x]
-    }
-  }
-
-  const stack = [[sy, sx, maxSteps]]
+  const stack = [[sy, sx, remainingSteps]]
   const seen = new Set()
   const reachable = new Set()
 
@@ -65,7 +38,7 @@ const solve1 = (grid: Puzzle, maxSteps: number) => {
     if (seen.has(key)) continue
     seen.add(key)
 
-    // Add event remaining steps to reachable fields
+    // Even fields can only accessed by even number of steps
     if (steps % 2 == 0) reachable.add(key)
 
     // Stop when remaining steps exeeded
@@ -73,13 +46,18 @@ const solve1 = (grid: Puzzle, maxSteps: number) => {
 
     for (const [dy, dx] of dirs) {
       const [ny, nx] = [y + dy, x + dx]
-      if (!_.inRange(ny, 0, ym) || !_.inRange(nx, 0, xm)) continue
+      if (!_.inRange(ny, 0, yLen) || !_.inRange(nx, 0, xLen)) continue
       if (grid[ny][nx] == "#") continue
       stack.push([ny, nx, steps - 1])
     }
   }
 
   return reachable.size
+}
+
+const solve1 = (grid: Puzzle, maxSteps: number) => {
+  const [sy, sx] = [_.floor(grid.length / 2), _.floor(grid[0].length / 2)]
+  return bfs(grid, sy, sx, maxSteps)
 }
 
 const solve1Sample = runPart1 ? solve1(sample, 6) : "skipped"
@@ -91,13 +69,51 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-const solve2 = (data: Puzzle) => {
+const solve2 = (grid: Puzzle, steps: number) => {
+  const size = grid.length
+  const [centerY, centerX] = [_.floor(size / 2), _.floor(size / 2)]
+
+  const corners = [
+    [0, 0], // top left
+    [0, size - 1], // top right
+    [size - 1, 0], // bottom left
+    [size - 1, size - 1], // bottom right
+  ]
+
+  const centers = [
+    [0, centerX], // top center
+    [size - 1, centerX], // bottom center
+    [centerY, 0], // Left center
+    [centerY, size - 1], // Right center
+  ]
+
+  const gridSize = _.floor(steps / size) - 1
+  const odd = Math.pow(_.floor(gridSize / 2) * 2 + 1, 2)
+  const even = Math.pow(_.floor((gridSize + 1) / 2) * 2, 2)
+
+  const oddPoints = bfs(grid, centerY, centerX, size * 2 + 1)
+  const evenPoints = bfs(grid, centerY, centerX, size * 2)
+
+  const cornerSteps = size - 1
+  const cornerSum = _.sum(centers.map(([y, x]) => bfs(grid, y, x, cornerSteps)))
+
+  const smallSteps = _.floor(size / 2) - 1
+  const smallSum = _.sum(corners.map(([y, x]) => bfs(grid, y, x, smallSteps)))
+
+  const largeSteps = _.floor(size * 3 / 2) - 1
+  const largeSum = _.sum(corners.map(([y, x]) => bfs(grid, y, x, largeSteps)))
+
+  return _.sum([
+    odd * oddPoints,
+    even * evenPoints,
+    cornerSum,
+    (gridSize + 1) * smallSum,
+    gridSize * largeSum,
+  ])
 }
 
-const solve2Sample = runPart2 ? solve2(sample) : "skipped"
-const solve2Data = runPart2 && runBoth ? solve2(task) : "skipped"
+const solve2Data = runPart2 && runBoth ? solve2(task, 26501365) : "skipped"
 
 console.log("\nPart 2:")
-console.log("Sample:\t", solve2Sample)
 console.log("Task:\t", solve2Data)
 console.log()
