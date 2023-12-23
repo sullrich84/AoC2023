@@ -21,7 +21,14 @@ const runBoth = true
 
 /// Part 1
 
-function draw(data: Puzzle, sy: number, sx: number, ty: number, tx: number) {
+function draw(
+  data: Puzzle,
+  sy: number,
+  sx: number,
+  ty: number,
+  tx: number,
+  wp?: Waypoints,
+) {
   console.log()
   console.log()
   console.log()
@@ -30,7 +37,8 @@ function draw(data: Puzzle, sy: number, sx: number, ty: number, tx: number) {
     row.forEach((col, x) => {
       if (col == "^" || col == "<") throw "Unexpected slope"
 
-      if (y == sy && x == sx) line += c.cyan("S")
+      if (wp && wp[[y, x].join(":")] != undefined) line += c.yellow("I")
+      else if (y == sy && x == sx) line += c.cyan("S")
       else if (y == ty && x == tx) line += c.red("T")
       else line += col
     })
@@ -109,49 +117,51 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
+type Waypoints = {
+  [key: string]: {
+    pos: [number, number]
+    adj: {
+      [key: string]: number
+    }
+  }
+}
+
 const solve2 = (data: Puzzle) => {
   const [yLen, xLen] = [data.length, data[0].length]
 
-  const stack: Stack = []
-  stack.push([0, 1, yLen - 1, xLen - 2, new Set()])
+  const [sy, sx] = [0, 1]
+  const [ty, tx] = [yLen - 1, xLen - 2]
 
-  let maxSteps = Number.NEGATIVE_INFINITY
-  while (stack.length > 0) {
-    const [y, x, ty, tx, seen] = stack.pop()!
-    // draw(data, y, x, ty, tx)
+  const sKey = [sy, sx].join(":")
+  const tKey = [ty, tx].join(":")
 
-    // Check if target reached
-    if (y == ty && x == tx) {
-      console.log(`Target Reached with ${seen.size} steps`)
-      maxSteps = Math.max(maxSteps, seen.size)
-      continue
-    }
+  const wp: Waypoints = {
+    [sKey]: {
+      pos: [sy, sx],
+      adj: {},
+    },
+    [tKey]: {
+      pos: [ty, tx],
+      adj: {},
+    },
+  }
 
-    // Update state
-    const nSeen = new Set(seen)
-    const key = [y, x].join(":")
-    nSeen.add(key)
+  // Find all intersections on the map
+  for (let y = 0; y < yLen; y++) {
+    for (let x = 0; x < xLen; x++) {
+      const tile = data[y][x]
+      if (tile == "#") continue
 
-    // Move
-    let tile = data[y][x]
-    if (tile == ">" || tile == "v") tile = "."
-    const nDir = dir[tile]
+      const win = dir["."].map(([dy, dx]) => _.get(data, [y + dy, x + dx]))
+      const walls = _.countBy(win, (t) => t == "#").true || 0
+      if (walls >= 2) continue
 
-    for (const [dy, dx] of nDir) {
-      const [ny, nx] = [y + dy, x + dx]
-      if (!_.inRange(ny, 0, yLen) || !_.inRange(nx, 0, xLen)) continue // out of bounds
-
-      const nTile = data[ny][nx]
-      if (nTile == "#") continue // skip forest
-
-      const nKey = [ny, nx].join(":")
-      if (nSeen.has(nKey)) continue // already entered
-
-      stack.push([ny, nx, ty, tx, nSeen])
+      const key = [y, x].join(":")
+      wp[key] = { pos: [y, x], adj: {} }
     }
   }
 
-  return maxSteps
+  draw(data, sy, sx, ty, tx, wp)
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
