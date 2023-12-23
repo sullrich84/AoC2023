@@ -17,7 +17,7 @@ console.log("🎄 Day 23: A Long Walk")
 
 const runPart1 = false
 const runPart2 = true
-const runBoth = true
+const runBoth = false
 
 /// Part 1
 
@@ -62,35 +62,57 @@ const dir = {
   ],
 }
 
-type Stack = [number, number, number, number, Set<string>][]
+type Stack = [
+  number,
+  number,
+  number,
+  number,
+  Set<string>,
+  number,
+  string[],
+][]
 
-const solve1 = (data: Puzzle) => {
+const solve1 = (data: Puzzle, wp?: Set<string>) => {
   const [yLen, xLen] = [data.length, data[0].length]
 
   const stack: Stack = []
-  stack.push([0, 1, yLen - 1, xLen - 2, new Set()])
+  stack.push([0, 1, yLen - 1, xLen - 2, new Set(), 0, []])
 
+  const fastLeap = new Map<string, [number, number, number]>()
   let maxSteps = Number.NEGATIVE_INFINITY
+
   while (stack.length > 0) {
-    const [y, x, ty, tx, seen] = stack.pop()!
-    // draw(data, y, x, ty, tx)
+    const [y, x, ty, tx, seen, steps, wpPath] = stack.pop()!
+    // draw(data, y, x, ty, tx, steps)
+    // console.log(steps)
 
     // Check if target reached
     if (y == ty && x == tx) {
       console.log(`Target Reached with ${seen.size} steps`)
-      maxSteps = Math.max(maxSteps, seen.size)
+      maxSteps = Math.max(maxSteps, steps)
       continue
     }
 
     // Update state
-    const nSeen = new Set(seen)
     const key = [y, x].join(":")
+    if (seen.has(key)) continue
+    const nSeen = new Set(seen)
     nSeen.add(key)
+    const nSteps = steps + 1
+    let nwpPath = [...wpPath, key]
 
     // Move
-    const tile = data[y][x]
+    let tile = data[y][x]
+    if (wp != undefined && tile != ".") tile = "."
     const nDir = dir[tile]
 
+    if (wp && wp.has(key) && wpPath.length > 0) {
+      nwpPath = []
+      console.log("Fast leap found", key, wpPath[1], wpPath.length)
+      fastLeap.set(wpPath[0], [y, x, wpPath.length])
+    }
+
+    // No connection between waypoints found
     for (const [dy, dx] of nDir) {
       const [ny, nx] = [y + dy, x + dx]
       if (!_.inRange(ny, 0, yLen) || !_.inRange(nx, 0, xLen)) continue // out of bounds
@@ -101,7 +123,13 @@ const solve1 = (data: Puzzle) => {
       const nKey = [ny, nx].join(":")
       if (nSeen.has(nKey)) continue // already entered
 
-      stack.push([ny, nx, ty, tx, nSeen])
+      if (fastLeap.has(nKey)) {
+        const [fly, flx, flSteps] = fastLeap.get(nKey)!
+        // console.log("Leaping", steps, flSteps)
+        stack.push([fly, flx, ty, tx, nSeen, nSteps + flSteps, nwpPath])
+      } else {
+        stack.push([ny, nx, ty, tx, nSeen, nSteps, nwpPath])
+      }
     }
   }
 
@@ -117,34 +145,9 @@ console.log("Task:\t", solve1Data)
 
 /// Part 2
 
-type Waypoints = {
-  [key: string]: {
-    pos: [number, number]
-    adj: {
-      [key: string]: number
-    }
-  }
-}
-
 const solve2 = (data: Puzzle) => {
   const [yLen, xLen] = [data.length, data[0].length]
-
-  const [sy, sx] = [0, 1]
-  const [ty, tx] = [yLen - 1, xLen - 2]
-
-  const sKey = [sy, sx].join(":")
-  const tKey = [ty, tx].join(":")
-
-  const wp: Waypoints = {
-    [sKey]: {
-      pos: [sy, sx],
-      adj: {},
-    },
-    [tKey]: {
-      pos: [ty, tx],
-      adj: {},
-    },
-  }
+  const waypoints = new Set()
 
   // Find all intersections on the map
   for (let y = 0; y < yLen; y++) {
@@ -157,11 +160,11 @@ const solve2 = (data: Puzzle) => {
       if (walls >= 2) continue
 
       const key = [y, x].join(":")
-      wp[key] = { pos: [y, x], adj: {} }
+      waypoints.add(key)
     }
   }
 
-  draw(data, sy, sx, ty, tx, wp)
+  return solve1(data, waypoints)
 }
 
 const solve2Sample = runPart2 ? solve2(sample) : "skipped"
