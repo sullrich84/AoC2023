@@ -22,7 +22,7 @@ const runBoth = false
 
 const solve1 = (data: Puzzle) => {
   // TEMPLATE
-  for(const row in data) {
+  for(const row of data) {
     console.log(row.join(""))
   }
 }
