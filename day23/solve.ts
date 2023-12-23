@@ -1,14 +1,9 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
 import { read } from "../utils/Reader.ts"
-import * as c from "https://deno.land/std@0.210.0/fmt/colors.ts"
-import { wait } from "../utils/utils.ts"
-import { string } from "npm:mathjs"
 
 type Puzzle = string[][]
 
-// sample.txt
-// task.txt
 const [task, sample] = read("day23").map((file) =>
   _.initial(file.split("\n").map((line) => line.split("")))
 )
@@ -21,32 +16,6 @@ const runPart2 = true
 const runBoth = true
 
 /// Part 1
-
-function draw(
-  data: Puzzle,
-  sy: number,
-  sx: number,
-  ty: number,
-  tx: number,
-  wp?: Waypoints,
-) {
-  console.log()
-  console.log()
-  console.log()
-  data.forEach((row, y) => {
-    let line = ""
-    row.forEach((col, x) => {
-      if (col == "^" || col == "<") throw "Unexpected slope"
-
-      if (wp && wp[[y, x].join(":")] != undefined) line += c.yellow("I")
-      else if (y == sy && x == sx) line += c.cyan("S")
-      else if (y == ty && x == tx) line += c.red("T")
-      else line += col
-    })
-    console.log(line)
-  })
-  wait()
-}
 
 const dir = {
   ".": [
@@ -63,15 +32,7 @@ const dir = {
   ],
 }
 
-type Stack = [
-  number,
-  number,
-  number,
-  number,
-  Set<string>,
-  number,
-  string[],
-][]
+type Stack = [number, number, number, number, Set<string>][]
 
 const solve1 = (data: Puzzle) => {
   const [yLen, xLen] = [data.length, data[0].length]
@@ -95,19 +56,19 @@ const solve1 = (data: Puzzle) => {
     nSeen.add(key)
 
     // Move
-    let tile = data[y][x]
+    const tile = data[y][x]
     const nDir = dir[tile]
 
     // No connection between waypoints found
     for (const [dy, dx] of nDir) {
       const [ny, nx] = [y + dy, x + dx]
-      if (!_.inRange(ny, 0, yLen) || !_.inRange(nx, 0, xLen)) continue // out of bounds
+      if (!_.inRange(ny, 0, yLen) || !_.inRange(nx, 0, xLen)) continue
 
       const nTile = data[ny][nx]
-      if (nTile == "#") continue // skip forest
+      if (nTile == "#") continue
 
       const nKey = [ny, nx].join(":")
-      if (nSeen.has(nKey)) continue // already entered
+      if (nSeen.has(nKey)) continue
 
       stack.push([ny, nx, ty, tx, nSeen])
     }
@@ -124,6 +85,8 @@ console.log("Sample:\t", solve1Sample)
 console.log("Task:\t", solve1Data)
 
 /// Part 2
+
+type Path = { [key: string]: Map<string, number> }
 
 const solve2 = (data: Puzzle) => {
   const [yLen, xLen] = [data.length, data[0].length]
@@ -193,7 +156,7 @@ const solve2 = (data: Puzzle) => {
     const nSeen = new Set(seen)
     if (nSeen.has(key)) continue
     nSeen.add(key)
-    
+
     if (key == dest) {
       if (maxSteps < steps) {
         console.log("Target reached within", steps, "steps")
