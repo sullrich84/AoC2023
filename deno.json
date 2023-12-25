@@ -25,7 +25,8 @@
     "day21": "deno run --allow-read --watch day21/solve.ts",
     "day22": "deno run --allow-read --watch day22/solve.ts",
     "day23": "deno run --allow-read --watch day23/solve.ts",
-    "day24": "deno run --allow-read --watch day24/solve.ts"
+    "day24": "deno run --allow-read --watch day24/solve.ts",
+    "day25": "deno run --allow-read --watch day25/solve.ts"
   },
   "fmt": {
     "semiColons": false,
