@@ -1,7 +1,5 @@
 // @deno-types="npm:@types/lodash"
 import _ from "npm:lodash"
-// import {data, sample, Puzzle } from "./data.ts"
-
 import { read } from "../utils/Reader.ts"
 
 type Puzzle = string[][]
